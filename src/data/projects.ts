@@ -86,14 +86,14 @@ export const projects: Project[] = [
       "Digital & Social Media Assets"
     ],
     images: [
-      { src: "/projects/fido-dido/cover.png", caption: "" },
-      { src: "/projects/fido-dido/5.png", caption: "" },
-      { src: "/projects/fido-dido/8.1.png", caption: "" },
-      { src: "/projects/fido-dido/8.2.png", caption: "" },
-      { src: "/projects/fido-dido/8.3.png", caption: "" },
-      { src: "/projects/fido-dido/8.4.png", caption: "" },
-      { src: "/projects/fido-dido/9.png", caption: "" },
-      { src: "/projects/fido-dido/10.png", caption: "" },
+      { src: "/projects/fido-dido/cover.webp", caption: "" },
+      { src: "/projects/fido-dido/5.webp", caption: "" },
+      { src: "/projects/fido-dido/8.1.webp", caption: "" },
+      { src: "/projects/fido-dido/8.2.webp", caption: "" },
+      { src: "/projects/fido-dido/8.3.webp", caption: "" },
+      { src: "/projects/fido-dido/8.4.webp", caption: "" },
+      { src: "/projects/fido-dido/9.webp", caption: "" },
+      { src: "/projects/fido-dido/10.webp", caption: "" },
       
     ],
     tags: ["Identity", "Modular System", "Music"],

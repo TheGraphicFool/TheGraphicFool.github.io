@@ -4,6 +4,8 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { site } from "@/data/site";
 import { useLockBodyScroll } from "@/hooks/useLockBodyScroll";
+import { useActiveSection } from "@/hooks/useActiveSection";
+import { ScrollProgress } from "@/components/interactive/ScrollProgress";
 
 /** Absolute hashes so the nav works identically from `/work/[slug]`. */
 const NAV = [
@@ -17,6 +19,7 @@ export function Header() {
   const [open, setOpen] = useState(false);
 
   useLockBodyScroll(open);
+  const active = useActiveSection(NAV.map((item) => item.href.slice(2)));
 
   // Note: the panel closes from each link's own onClick rather than a
   // pathname effect — same result, without a render cascade on every nav.
@@ -54,15 +57,21 @@ export function Header() {
 
         {/* Desktop nav */}
         <nav className="hidden items-stretch lg:flex" aria-label="Main">
-          {NAV.map((item) => (
-            <Link
-              key={item.href}
-              href={item.href}
-              className="border-ink font-display hover:bg-yellow flex items-center border-l-[3px] px-7 text-sm transition-colors last:border-r-[3px]"
-            >
-              {item.label}
-            </Link>
-          ))}
+          {NAV.map((item) => {
+            const isActive = active === item.href.slice(2);
+            return (
+              <Link
+                key={item.href}
+                href={item.href}
+                aria-current={isActive ? "location" : undefined}
+                className={`border-ink font-display flex items-center gap-2 border-l-[3px] px-7 text-sm transition-colors last:border-r-[3px] ${
+                  isActive ? "bg-ink text-yellow" : "hover:bg-yellow"
+                }`}
+              >
+                {item.label}
+              </Link>
+            );
+          })}
         </nav>
 
         <div className="flex items-stretch">
@@ -103,6 +112,8 @@ export function Header() {
           </button>
         </div>
       </div>
+
+      <ScrollProgress />
 
       {/* Mobile panel */}
       {open && (

@@ -11,6 +11,7 @@ import {
 } from "@/data/projects";
 import { ACCENT_BG, ACCENT_TEXT } from "@/lib/accents";
 import { Marquee } from "@/components/ui/Marquee";
+import { Gallery } from "@/components/interactive/Gallery";
 import { site } from "@/data/site";
 
 /** Every project is known at build time — prerender the lot. */
@@ -179,29 +180,14 @@ export default async function CaseStudyPage(props: PageProps<"/work/[slug]">) {
           <div className="mx-auto w-full max-w-[1800px] px-4 py-14 sm:px-6 sm:py-20 lg:px-10">
             <p className="nb-label mb-8 opacity-60">
               Selected artwork — {gallery.length}{" "}
-              {gallery.length === 1 ? "piece" : "pieces"}
+              {gallery.length === 1 ? "piece" : "pieces"} · click to zoom
             </p>
-            <div className="grid gap-10 lg:gap-14">
-              {gallery.map((image, i) => (
-                <figure key={image.src}>
-                  <div className="nb-panel shadow-nb-lg bg-white mx-auto max-w-[1200px] overflow-hidden">
-                    <Image
-                      src={image.src}
-                      alt={`${project.title} — ${image.caption}`}
-                      width={width}
-                      height={height}
-                      sizes="(min-width: 1280px) 1200px, 100vw"
-                      className="h-auto w-full"
-                      loading={i === 0 ? "eager" : "lazy"}
-                    />
-                  </div>
-                  <figcaption className="nb-label mx-auto mt-4 flex max-w-[1200px] gap-3 opacity-55">
-                    <span>{String(i + 2).padStart(2, "0")}</span>
-                    <span>{image.caption}</span>
-                  </figcaption>
-                </figure>
-              ))}
-            </div>
+            <Gallery
+              title={project.title}
+              images={gallery}
+              width={width}
+              height={height}
+            />
           </div>
         </div>
       )}

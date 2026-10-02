@@ -1,5 +1,5 @@
 import { site } from "@/data/site";
-import { Sticker } from "@/components/ui/Sticker";
+import { DragSticker } from "@/components/interactive/DragSticker";
 import { Reveal } from "@/components/motion/Reveal";
 
 export function About() {
@@ -45,7 +45,7 @@ export function About() {
                 {site.toolkit.map((tool) => (
                   <li
                     key={tool}
-                    className="nb-panel nb-label shadow-nb-xs bg-white px-3 py-2 font-bold"
+                    className="nb-panel nb-label nb-wiggle shadow-nb-xs bg-white hover:bg-lime px-3 py-2 font-bold transition-colors"
                   >
                     {tool}
                   </li>
@@ -58,9 +58,9 @@ export function About() {
           <Reveal className="lg:col-span-5" delay={0.12} distance={30}>
             <div className="relative">
               <div className="absolute -top-5 -left-3 z-10 sm:-left-5">
-                <Sticker rotate={6} className="bg-cyan">
-                  Say hello
-                </Sticker>
+                <DragSticker rotate={6} className="bg-cyan">
+                  Say hello · drag me
+                </DragSticker>
               </div>
 
               <div className="nb-panel shadow-nb-lg bg-white">
