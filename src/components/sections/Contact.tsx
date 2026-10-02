@@ -1,5 +1,7 @@
 import { site } from "@/data/site";
 import { Reveal } from "@/components/motion/Reveal";
+import { BriefBuilder } from "@/components/interactive/BriefBuilder";
+import { CopyButton } from "@/components/interactive/CopyButton";
 
 export function Contact() {
   return (
@@ -41,6 +43,16 @@ export function Contact() {
               →
             </span>
           </a>
+          <div className="mt-5 flex flex-wrap items-center gap-3">
+            <CopyButton value={site.email} label="Copy email" />
+            <p className="nb-label opacity-60">or build a quick brief below ↓</p>
+          </div>
+        </Reveal>
+
+        <Reveal delay={0.12}>
+          <div className="mt-12 max-w-4xl">
+            <BriefBuilder />
+          </div>
         </Reveal>
 
         <Reveal delay={0.18}>

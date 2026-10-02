@@ -347,3 +347,27 @@
     transform: none;
   }
 }
+
+/* --------------------------------------------------------------------------
+   Small interaction flourishes
+   -------------------------------------------------------------------------- */
+
+@layer components {
+  /* Chips give a quick shake when you poke them. */
+  .nb-wiggle:hover {
+    animation: nb-wiggle 360ms ease-in-out;
+  }
+}
+
+@keyframes nb-wiggle {
+  0%,
+  100% {
+    transform: rotate(0);
+  }
+  25% {
+    transform: rotate(-4deg);
+  }
+  75% {
+    transform: rotate(4deg);
+  }
+}

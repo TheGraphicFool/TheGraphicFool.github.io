@@ -3,12 +3,17 @@
 import Link from "next/link";
 import { motion, useReducedMotion } from "framer-motion";
 import { site } from "@/data/site";
-import { Sticker } from "@/components/ui/Sticker";
+import { useRef } from "react";
+import { BouncyText } from "@/components/interactive/BouncyText";
+import { ColorBlock } from "@/components/interactive/ColorBlock";
+import { DragSticker } from "@/components/interactive/DragSticker";
+import { Tilt } from "@/components/interactive/Tilt";
 
 const EASE = [0.16, 1, 0.3, 1] as const;
 
 export function Hero() {
   const reduceMotion = useReducedMotion();
+  const sectionRef = useRef<HTMLElement>(null);
 
   /** On-load entrance only (not scroll-triggered — this is the first paint). */
   const slam = (delay: number, distance = 22) =>
@@ -21,7 +26,7 @@ export function Hero() {
         };
 
   return (
-    <section className="border-ink relative overflow-hidden border-b-[3px]">
+    <section ref={sectionRef} className="border-ink relative overflow-hidden border-b-[3px]">
       <div aria-hidden className="nb-grid-bg pointer-events-none absolute inset-0" />
 
       <div className="relative mx-auto w-full max-w-[1800px] px-4 sm:px-6 lg:px-10">
@@ -41,10 +46,11 @@ export function Hero() {
         */}
         <h1 className="mt-6 text-[clamp(2.75rem,11.5vw,10.5rem)] leading-[0.82]">
           <motion.span {...slam(0.06, 34)} className="block overflow-hidden">
-            Muhammad
+            <BouncyText text="Muhammad" />
           </motion.span>
           <motion.span {...slam(0.14, 34)} className="block overflow-hidden">
-            Ali <span className="nb-outline-text">Zahid</span>
+            <BouncyText text="Ali" />{" "}
+            <BouncyText text="Zahid" className="nb-outline-text" />
           </motion.span>
         </h1>
 
@@ -98,23 +104,19 @@ export function Hero() {
                       : { type: "spring", stiffness: 260, damping: 14, delay: 0.62 }
                   }
                 >
-                  <Sticker rotate={0} className="bg-lime">
+                  <DragSticker rotate={0} className="bg-lime" constraints={sectionRef}>
                     <span
                       aria-hidden
-                      className="bg-ink block h-2.5 w-2.5 rounded-full"
+                      className="bg-ink block h-2.5 w-2.5 animate-pulse rounded-full"
                     />
                     Open · {site.availableFrom}
-                  </Sticker>
+                  </DragSticker>
                 </motion.div>
               </div>
             )}
 
-            <div className="nb-panel shadow-nb-lg bg-white">
-              <div className="bg-pink border-ink grid place-items-center border-b-[3px] py-10">
-                <span className="font-display text-[clamp(3.5rem,9vw,5.5rem)] leading-none">
-                  {site.initials}
-                </span>
-              </div>
+            <Tilt className="nb-panel shadow-nb-lg overflow-hidden bg-white">
+              <ColorBlock label={site.initials} />
               <dl>
                 {site.facts.map((fact, i) => (
                   <div
@@ -130,7 +132,7 @@ export function Hero() {
                   </div>
                 ))}
               </dl>
-            </div>
+            </Tilt>
           </motion.div>
         </div>
       </div>

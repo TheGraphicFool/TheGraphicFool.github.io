@@ -3,6 +3,7 @@ import { Archivo_Black, Space_Grotesk, Space_Mono } from "next/font/google";
 import "./globals.css";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
+import { BackToTop } from "@/components/interactive/BackToTop";
 import { site } from "@/data/site";
 
 /** Display — single weight by design; Archivo Black has no lighter cuts. */
@@ -27,8 +28,9 @@ const spaceMono = Space_Mono({
 });
 
 export const metadata: Metadata = {
-  // TODO: point at the real domain before launch (or set NEXT_PUBLIC_SITE_URL).
-  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL ?? "https://example.com"),
+  metadataBase: new URL(
+    process.env.NEXT_PUBLIC_SITE_URL ?? "https://thegraphicfool.github.io"
+  ),
   title: {
     default: `${site.name} — ${site.role}`,
     template: `%s — ${site.name}`,
@@ -68,6 +70,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
           {children}
         </main>
         <Footer />
+        <BackToTop />
       </body>
     </html>
   );
