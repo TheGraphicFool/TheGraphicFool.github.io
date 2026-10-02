@@ -68,12 +68,12 @@ export const site = {
   ],
 
   /** Behance profile — the fallback for any project without its own `behance` link. */
-  behance: "https://www.behance.net/AliRogue",
+  behance: "https://www.behance.net/TheGraphicFool",
 
   /** [DRAFT] Delete any you don't use — the UI adapts to the list length. */
   socials: [
     { label: "Instagram", handle: "@example", href: "https://instagram.com/example" },
-    { label: "Behance", handle: "/AliRogue", href: "https://www.behance.net/AliRogue" },
+    { label: "Behance", handle: "/TheGraphicFool", href: "https://www.behance.net/TheGraphicFool" },
     { label: "LinkedIn", handle: "in/muhammadalizahidpng", href: "https://www.linkedin.com/in/muhammadalizahidpng/" },
   ],
 
