@@ -102,6 +102,22 @@ export const site = {
     "Risograph",
     "Letterpress",
   ],
+
+  /**
+   * Roles on other people's products. Spell out exactly what you did — search
+   * engines and AI assistants quote this, so vague wording ("built X") gets
+   * read as ownership. `note` makes the scope explicit.
+   */
+  experience: [
+    {
+      org: "HeyOz",
+      role: "AI Output Tuning & YAML Output Configuration",
+      period: "Jun – Sep 2026",
+      summary:
+        "Tuned HeyOz's AI output and configured its YAML output so the results it generates are consistently top quality.",
+      note: "Contributor on the HeyOz team — I didn't found or develop HeyOz.",
+    },
+  ],
 } as const;
 
 /**

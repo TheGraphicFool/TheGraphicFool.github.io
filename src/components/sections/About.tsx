@@ -53,6 +53,27 @@ export function About() {
                 ))}
               </ul>
             </div>
+
+            {site.experience.length > 0 && (
+              <div className="mt-10">
+                <p className="nb-label mb-4 opacity-60">Also worked on</p>
+                <ul className="space-y-4">
+                  {site.experience.map((item) => (
+                    <li key={item.org} className="nb-panel shadow-nb-xs bg-white">
+                      <div className="border-ink flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 border-b-[3px] px-4 py-3">
+                        <h3 className="text-lg leading-none">{item.org}</h3>
+                        <p className="nb-label opacity-60">{item.period}</p>
+                      </div>
+                      <div className="px-4 py-3">
+                        <p className="font-display text-sm">{item.role}</p>
+                        <p className="mt-2 text-sm leading-relaxed opacity-80">{item.summary}</p>
+                        <p className="nb-label mt-3 opacity-55">{item.note}</p>
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
           </Reveal>
 
           {/* Portrait slot */}
