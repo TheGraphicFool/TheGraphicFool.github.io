@@ -1,10 +1,15 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Archivo_Black, Space_Grotesk, Space_Mono } from "next/font/google";
 import "./globals.css";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { BackToTop } from "@/components/interactive/BackToTop";
 import { site } from "@/data/site";
+import { JsonLd } from "@/components/seo/JsonLd";
+import { siteJsonLd } from "@/lib/seo";
+import { OG_ALT, OG_SIZE } from "@/lib/og";
+
+const shareImage = { url: "/og.png", ...OG_SIZE, alt: OG_ALT, type: "image/png" };
 
 /** Display — single weight by design; Archivo Black has no lighter cuts. */
 const archivoBlack = Archivo_Black({
@@ -27,26 +32,54 @@ const spaceMono = Space_Mono({
   display: "swap",
 });
 
+// Search results show ~60 characters of title and ~155 of description, so the
+// target phrase ("The Graphic Fool") leads and both stay inside those limits.
+const defaultTitle = `${site.brand} — ${site.name}, ${site.role}`;
+const description = `${site.brand} is the portfolio of ${site.name}, a ${site.role.toLowerCase()} in Lahore — identity systems, packaging, editorial and art direction.`;
+
 export const metadata: Metadata = {
-  metadataBase: new URL(
-    process.env.NEXT_PUBLIC_SITE_URL ?? "https://thegraphicfool.github.io"
-  ),
+  metadataBase: new URL(site.url),
   title: {
-    default: `${site.name} — ${site.role}`,
-    template: `%s — ${site.name}`,
+    default: defaultTitle,
+    template: `%s — ${site.brand}`,
   },
-  description: site.tagline,
+  description,
+  applicationName: site.brand,
+  keywords: [...site.keywords],
+  authors: [{ name: site.name, url: site.url }],
+  creator: site.name,
+  publisher: site.name,
+  alternates: { canonical: "/" },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: { index: true, follow: true, "max-image-preview": "large", "max-snippet": -1 },
+  },
   openGraph: {
     type: "website",
-    title: `${site.name} — ${site.role}`,
-    description: site.tagline,
-    siteName: site.name,
+    locale: "en_US",
+    url: "/",
+    title: defaultTitle,
+    description,
+    siteName: site.brand,
+    images: [shareImage],
   },
   twitter: {
     card: "summary_large_image",
-    title: `${site.name} — ${site.role}`,
-    description: site.tagline,
+    title: defaultTitle,
+    description,
+    images: [shareImage],
   },
+  icons: {
+    apple: "/apple-touch-icon.png",
+  },
+  ...(site.googleSiteVerification
+    ? { verification: { google: site.googleSiteVerification } }
+    : {}),
+};
+
+export const viewport: Viewport = {
+  themeColor: "#0a0a0a",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
@@ -59,6 +92,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       className={`${archivoBlack.variable} ${spaceGrotesk.variable} ${spaceMono.variable} h-full antialiased`}
     >
       <body className="flex min-h-full flex-col">
+        <JsonLd data={siteJsonLd()} />
         <a
           href="#main"
           className="nb-panel bg-yellow font-display sr-only px-4 py-3 focus:not-sr-only focus:absolute focus:top-3 focus:left-3 focus:z-[70]"

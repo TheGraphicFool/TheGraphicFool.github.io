@@ -18,6 +18,15 @@
 
 export const site = {
   name: "Muhammad Ali Zahid",
+  /** Studio / brand name. Used in titles, structured data and visible copy so
+   * searches for "The Graphic Fool" land here. */
+  brand: "The Graphic Fool",
+  /** Other spellings people search for — fed to structured data. */
+  aliases: ["TheGraphicFool", "Graphic Fool", "Ali Zahid", "Muhammad Ali Zahid designer"],
+  /** Canonical origin. Overridable at build time with NEXT_PUBLIC_SITE_URL. */
+  url: process.env.NEXT_PUBLIC_SITE_URL ?? "https://thegraphicfool.github.io",
+  /** Square-ish photo used for structured data and the share card. */
+  portrait: "/portrait.webp",
   /** Compact form for the header lockup and tight spaces. */
   shortName: "Ali Zahid",
   initials: "AZ",
@@ -35,6 +44,28 @@ export const site = {
   /** [DRAFT] Shown in the availability pill. */
   availableFrom: "Q4 2026",
   available: true,
+
+  /**
+   * Paste the code from Google Search Console's "HTML tag" verification
+   * method here (just the content="…" value). Empty = no tag.
+   */
+  googleSiteVerification: "",
+
+  /** Search keywords — kept short and honest; Google mostly ignores the
+   * keywords tag, but other engines and some tools still read it. */
+  keywords: [
+    "The Graphic Fool",
+    "TheGraphicFool",
+    "Muhammad Ali Zahid",
+    "Ali Zahid designer",
+    "graphic designer Lahore",
+    "brand identity designer Pakistan",
+    "print designer",
+    "packaging design",
+    "editorial design",
+    "art direction",
+    "portfolio",
+  ],
 
   /** Behance profile — the fallback for any project without its own `behance` link. */
   behance: "https://www.behance.net/AliRogue",

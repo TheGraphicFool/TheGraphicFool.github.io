@@ -14,6 +14,8 @@ import { ACCENT_BG, ACCENT_TEXT } from "@/lib/accents";
 import { Marquee } from "@/components/ui/Marquee";
 import { Gallery } from "@/components/interactive/Gallery";
 import { BehanceButton } from "@/components/ui/BehanceButton";
+import { JsonLd } from "@/components/seo/JsonLd";
+import { absoluteUrl } from "@/lib/seo";
 import { site } from "@/data/site";
 
 /** Every project is known at build time — prerender the lot. */
@@ -28,13 +30,29 @@ export async function generateMetadata(
   const project = getProject(slug);
   if (!project) return {};
 
+  const title = `${project.title} — ${project.category} project`;
+  const description = `${project.description} ${project.category} work by ${site.name} (${site.brand}).`;
+  const url = `/work/${project.id}/`;
+  const image = { url: coverOf(project).src, alt: `${project.title} — cover artwork` };
+
   return {
-    title: project.title,
-    description: project.description,
+    title,
+    description,
+    keywords: [...project.tags, project.category, site.brand, site.name],
+    alternates: { canonical: url },
     openGraph: {
-      title: `${project.title} — ${site.name}`,
-      description: project.description,
-      images: [{ url: coverOf(project).src }],
+      type: "article",
+      url,
+      siteName: site.brand,
+      title: `${project.title} — ${site.brand}`,
+      description,
+      images: [image],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: `${project.title} — ${site.brand}`,
+      description,
+      images: [image],
     },
   };
 }
@@ -62,8 +80,40 @@ export default async function CaseStudyPage(props: PageProps<"/work/[slug]">) {
     { label: "Outcome", text: project.outcome },
   ];
 
+  const structuredData = {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "CreativeWork",
+        "@id": absoluteUrl(`/work/${project.id}/#work`),
+        name: project.title,
+        headline: project.title,
+        description: project.description,
+        abstract: project.overview,
+        url: absoluteUrl(`/work/${project.id}/`),
+        image: project.images.map((image) => absoluteUrl(image.src)),
+        dateCreated: project.year,
+        genre: project.category,
+        keywords: project.tags.join(", "),
+        creator: { "@id": absoluteUrl("/#person") },
+        author: { "@id": absoluteUrl("/#person") },
+        isPartOf: { "@id": absoluteUrl("/#website") },
+        ...(project.behance ? { sameAs: project.behance } : {}),
+      },
+      {
+        "@type": "BreadcrumbList",
+        itemListElement: [
+          { "@type": "ListItem", position: 1, name: site.brand, item: absoluteUrl("/") },
+          { "@type": "ListItem", position: 2, name: "Work", item: absoluteUrl("/#work") },
+          { "@type": "ListItem", position: 3, name: project.title, item: absoluteUrl(`/work/${project.id}/`) },
+        ],
+      },
+    ],
+  };
+
   return (
     <article>
+      <JsonLd data={structuredData} />
       {/* Breadcrumb bar */}
       <div className="border-ink border-b-[3px]">
         <div className="mx-auto flex w-full max-w-[1800px] items-center justify-between gap-4 px-4 py-3 sm:px-6 lg:px-10">

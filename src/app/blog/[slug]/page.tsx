@@ -3,6 +3,8 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { formatDate, getPost, getPosts } from "@/lib/blog";
 import { site } from "@/data/site";
+import { JsonLd } from "@/components/seo/JsonLd";
+import { absoluteUrl } from "@/lib/seo";
 
 export function generateStaticParams() {
   const params = getPosts().map((post) => ({ slug: post.slug }));
@@ -15,14 +17,27 @@ export async function generateMetadata(props: PageProps<"/blog/[slug]">): Promis
   const { slug } = await props.params;
   const post = getPost(slug);
   if (!post) return {};
+  const description = post.excerpt || `${post.title} — a post by ${site.name} (${site.brand}).`;
+  const url = `/blog/${post.slug}/`;
   return {
     title: post.title,
-    description: post.excerpt || undefined,
+    description,
+    alternates: { canonical: url },
     openGraph: {
       type: "article",
-      title: `${post.title} — ${site.name}`,
-      description: post.excerpt || undefined,
-      images: [{ url: post.cover }],
+      url,
+      siteName: site.brand,
+      title: `${post.title} — ${site.brand}`,
+      description,
+      publishedTime: post.date,
+      authors: [site.name],
+      images: [{ url: post.cover, alt: post.title }],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: `${post.title} — ${site.brand}`,
+      description,
+      images: [{ url: post.cover, alt: post.title }],
     },
   };
 }
@@ -37,8 +52,23 @@ export default async function BlogPost(props: PageProps<"/blog/[slug]">) {
   const newer = posts[index - 1];
   const older = posts[index + 1];
 
+  const structuredData = {
+    "@context": "https://schema.org",
+    "@type": "BlogPosting",
+    headline: post.title,
+    description: post.excerpt || undefined,
+    image: absoluteUrl(post.cover),
+    datePublished: post.date,
+    url: absoluteUrl(`/blog/${post.slug}/`),
+    mainEntityOfPage: absoluteUrl(`/blog/${post.slug}/`),
+    author: { "@id": absoluteUrl("/#person") },
+    publisher: { "@id": absoluteUrl("/#person") },
+    isPartOf: { "@id": absoluteUrl("/#website") },
+  };
+
   return (
     <article>
+      <JsonLd data={structuredData} />
       <div className="border-ink border-b-[3px]">
         <div className="mx-auto flex w-full max-w-[1800px] items-center justify-between gap-4 px-4 py-3 sm:px-6 lg:px-10">
           <Link
