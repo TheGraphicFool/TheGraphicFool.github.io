@@ -34,6 +34,8 @@ export function Hero() {
           {...slam(0, 12)}
           className="flex flex-wrap items-center gap-x-4 gap-y-2 pt-10 lg:pt-14"
         >
+          <p className="nb-label font-bold">{site.brand}</p>
+          <span aria-hidden className="bg-ink h-[3px] w-10" />
           <p className="nb-label opacity-60">Portfolio — Vol. 01</p>
           <span aria-hidden className="bg-ink h-[3px] w-10" />
           <p className="nb-label opacity-60">{site.location}</p>

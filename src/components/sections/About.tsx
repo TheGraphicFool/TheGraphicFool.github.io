@@ -15,7 +15,7 @@ export function About() {
       <div className="relative mx-auto w-full max-w-[1800px] px-4 py-14 sm:px-6 sm:py-20 lg:px-10">
         <div className="grid gap-12 lg:grid-cols-12 lg:gap-10">
           <Reveal className="lg:col-span-7">
-            <p className="nb-label opacity-60">About</p>
+            <p className="nb-label opacity-60">About — {site.brand}</p>
             <h2
               id="about-heading"
               className="mt-3 text-[clamp(2.5rem,8vw,6rem)] leading-[0.85]"

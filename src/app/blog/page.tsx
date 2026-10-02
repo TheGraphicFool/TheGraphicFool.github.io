@@ -3,10 +3,20 @@ import Image from "next/image";
 import Link from "next/link";
 import { formatDate, getPosts } from "@/lib/blog";
 import { Reveal } from "@/components/motion/Reveal";
+import { site } from "@/data/site";
 
 export const metadata: Metadata = {
   title: "Blog",
-  description: "Notes, process, and work in progress.",
+  description: `Notes, process and work in progress from ${site.name} — ${site.brand}, a ${site.role.toLowerCase()} in ${site.location}.`,
+  alternates: { canonical: "/blog/" },
+  openGraph: {
+    type: "website",
+    url: "/blog/",
+    siteName: site.brand,
+    title: `Blog — ${site.brand}`,
+    description: `Notes, process and work in progress from ${site.name}.`,
+    images: [{ url: "/og.png", width: 1200, height: 630 }],
+  },
 };
 
 const TILTS = ["-1.5deg", "1deg", "-0.5deg", "1.5deg"];

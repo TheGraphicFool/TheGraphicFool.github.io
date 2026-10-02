@@ -40,6 +40,23 @@ all from GitHub's web UI: upload the image to `public/blog/`, then add the
 `.md` file with **Add file → Create new file**. `content/blog/_template.md`
 shows every field; add `draft: true` to hide a post.
 
+## SEO
+
+Built in: page titles/descriptions led by "The Graphic Fool", canonical URLs,
+`/sitemap.xml`, `/robots.txt`, schema.org structured data (Person, WebSite,
+CreativeWork per project, BlogPosting per post), and a share card at `/og.png`
+generated from `public/portrait.webp` on every build.
+
+To get indexed:
+
+1. Open [Google Search Console](https://search.google.com/search-console),
+   add a **URL prefix** property for `https://thegraphicfool.github.io/`.
+2. Choose the **HTML tag** method, copy the `content="…"` value into
+   `googleSiteVerification` in `src/data/site.ts`, push, then click Verify.
+3. In Search Console → **Sitemaps**, submit `sitemap.xml`.
+4. Link the site from your Behance, LinkedIn and Instagram profiles — links
+   from profiles that already rank for your name are what lift it.
+
 ## Adding artwork
 
 There's no image server on Pages, so images ship exactly as they sit in

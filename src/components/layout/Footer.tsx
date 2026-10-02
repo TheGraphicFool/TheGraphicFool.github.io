@@ -9,7 +9,8 @@ export function Footer() {
       <div className="mx-auto w-full max-w-[1800px]">
         <div className="grid gap-px sm:grid-cols-2 lg:grid-cols-4">
           <div className="px-4 py-8 sm:px-6 lg:py-10">
-            <p className="font-display text-yellow text-2xl">{site.shortName}</p>
+            <p className="font-display text-yellow text-2xl">{site.brand}</p>
+            <p className="font-display mt-1 text-base">{site.name}</p>
             <p className="nb-label mt-3 opacity-60">{site.role}</p>
             <p className="nb-label mt-1 opacity-60">{site.location}</p>
           </div>
@@ -64,7 +65,7 @@ export function Footer() {
 
         <div className="border-paper/25 flex flex-col gap-2 border-t px-4 py-5 sm:flex-row sm:items-center sm:justify-between sm:px-6">
           <p className="nb-label opacity-60">
-            © {year} {site.name}
+            © {year} {site.name} · {site.brand}
           </p>
           <p className="nb-label opacity-60">
             Built with Next.js · Set in Archivo Black & Space Grotesk
