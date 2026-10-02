@@ -43,7 +43,7 @@ export function siteJsonLd() {
         sameAs: profileLinks,
         // Contribution roles, stated precisely so they aren't read as
         // ownership (e.g. "HeyOz: AI output tuning", not "built HeyOz").
-        hasOccupation: site.experience.map((item) => ({
+        hasOccupation: (site.showExperience ? site.experience : []).map((item) => ({
           "@type": "Occupation",
           name: `${item.role} — ${item.org}`,
           description: `${item.period}. ${item.summary} ${item.note}`,

@@ -108,6 +108,9 @@ export const site = {
    * engines and AI assistants quote this, so vague wording ("built X") gets
    * read as ownership. `note` makes the scope explicit.
    */
+  /** Hidden for now — flip to true to show "Also worked on" on the site
+   * (About section + structured data). The entries below are kept. */
+  showExperience: false,
   experience: [
     {
       org: "HeyOz",

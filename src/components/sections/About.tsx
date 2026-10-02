@@ -54,7 +54,7 @@ export function About() {
               </ul>
             </div>
 
-            {site.experience.length > 0 && (
+            {site.showExperience && site.experience.length > 0 && (
               <div className="mt-10">
                 <p className="nb-label mb-4 opacity-60">Also worked on</p>
                 <ul className="space-y-4">
