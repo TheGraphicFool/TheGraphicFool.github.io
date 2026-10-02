@@ -39,7 +39,7 @@ export function Contact() {
             {/* The canvas bleeds past its slot so the planet can be big
                 without pushing the headline around. */}
             <div className="relative mx-auto aspect-square w-full max-w-[600px] lg:max-w-[720px]">
-              <div className="absolute -inset-[4%] sm:-inset-[8%] lg:-inset-[16%]">
+              <div className="absolute inset-0 sm:-inset-[6%] lg:-inset-[16%]">
                 <AsciiPlanet />
               </div>
               <span className="nb-label pointer-events-none absolute right-0 bottom-0 opacity-50">

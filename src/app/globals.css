@@ -147,9 +147,13 @@
       background-color 120ms linear;
   }
 
-  .nb-press:hover {
-    transform: translate(-2px, -2px);
-    box-shadow: var(--shadow-nb-lg);
+  /* Hover lifts only where hover is real. On touch screens a tap leaves
+     :hover "stuck" on the element until you tap elsewhere. */
+  @media (hover: hover) and (pointer: fine) {
+    .nb-press:hover {
+      transform: translate(-2px, -2px);
+      box-shadow: var(--shadow-nb-lg);
+    }
   }
 
   .nb-press:active {
@@ -164,9 +168,11 @@
       box-shadow 220ms cubic-bezier(0.22, 1, 0.36, 1);
   }
 
-  .nb-lift:hover {
-    transform: translate(-5px, -5px) rotate(var(--tilt, 0deg));
-    box-shadow: var(--shadow-nb-xl);
+  @media (hover: hover) and (pointer: fine) {
+    .nb-lift:hover {
+      transform: translate(-5px, -5px) rotate(var(--tilt, 0deg));
+      box-shadow: var(--shadow-nb-xl);
+    }
   }
 
   /* --------------------------------------------------------------------------
@@ -237,8 +243,12 @@
   }
 
   /* Pausing on hover lets people actually read a client name. */
-  .nb-marquee:hover .nb-marquee-track {
-    animation-play-state: paused;
+  /* Mouse only — on a phone a tap would freeze the ticker until the next
+     tap somewhere else. */
+  @media (hover: hover) and (pointer: fine) {
+    .nb-marquee:hover .nb-marquee-track {
+      animation-play-state: paused;
+    }
   }
 
   /* --------------------------------------------------------------------------
@@ -354,8 +364,10 @@
 
 @layer components {
   /* Chips give a quick shake when you poke them. */
-  .nb-wiggle:hover {
-    animation: nb-wiggle 360ms ease-in-out;
+  @media (hover: hover) and (pointer: fine) {
+    .nb-wiggle:hover {
+      animation: nb-wiggle 360ms ease-in-out;
+    }
   }
 }
 

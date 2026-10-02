@@ -51,7 +51,7 @@ export function Header() {
         {/* Logo lockup */}
         <Link
           href="/"
-          className="border-ink group flex items-center gap-3 border-r-[3px] py-3 pr-4 pl-4 sm:gap-4 sm:pr-6 sm:pl-6"
+          className="border-ink group flex min-w-0 flex-1 items-center gap-3 py-3 pr-4 pl-4 sm:gap-4 sm:pr-6 sm:pl-6 lg:flex-none lg:border-r-[3px]"
           aria-label={`${site.brand} — ${site.name}, home`}
         >
           <span className="bg-ink text-yellow font-display grid h-9 w-9 place-items-center text-sm transition-colors group-hover:bg-pink group-hover:text-ink sm:h-11 sm:w-11 sm:text-base">
