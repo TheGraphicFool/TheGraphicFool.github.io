@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 1200" width="1200" height="1200">
+      <rect width="1200" height="1200" fill="#F4F1E8"/>
+      <defs><pattern id="hzcoastline-radio-0" width="108" height="108" patternTransform="rotate(45)" patternUnits="userSpaceOnUse"><rect width="54" height="108" fill="#FFE600"/></pattern></defs><rect x="0" y="936" width="1200" height="264" fill="url(#hzcoastline-radio-0)"/>
+      <rect x="0" y="936" width="1200" height="264" fill="none" stroke="#0A0A0A" stroke-width="17"/>
+      <circle cx="600" cy="504" r="408.00000000000006" fill="none" stroke="#0A0A0A" stroke-width="40.8"/><circle cx="600" cy="504" r="408.00000000000006" fill="none" stroke="#00E0FF" stroke-width="23.799999999999997"/><circle cx="600" cy="504" r="288" fill="none" stroke="#0A0A0A" stroke-width="40.8"/><circle cx="600" cy="504" r="288" fill="none" stroke="#7B4DFF" stroke-width="23.799999999999997"/><circle cx="600" cy="504" r="168.00000000000003" fill="none" stroke="#0A0A0A" stroke-width="40.8"/><circle cx="600" cy="504" r="168.00000000000003" fill="none" stroke="#00E0FF" stroke-width="23.799999999999997"/>
+      <circle cx="628.8" cy="532.8" r="84.00000000000001" fill="#0A0A0A" stroke="none" stroke-width="0"/><circle cx="600" cy="504" r="84.00000000000001" fill="#7B4DFF" stroke="#0A0A0A" stroke-width="17"/>
+    </svg>

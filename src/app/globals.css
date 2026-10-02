@@ -1,0 +1,349 @@
+@import "tailwindcss";
+
+/* ==========================================================================
+   NEO-BRUTALISM — "ACID POP"
+   Flat fills, 3px black outlines, hard offset shadows, zero gradients,
+   zero soft blur. Every surface is a physical object with an edge.
+   ========================================================================== */
+
+:root {
+  --paper: #f4f1e8;
+  --ink: #0a0a0a;
+  --paper-2: #ebe7db;
+  --white: #ffffff;
+
+  --yellow: #ffe600;
+  --pink: #ff3d8b;
+  --cyan: #00e0ff;
+  --violet: #7b4dff;
+  --lime: #b8ff3d;
+  --orange: #ff6b1a;
+
+  /* Structural constants — the whole system keys off these three. */
+  --nb-border: 3px;
+  --nb-offset: 6px;
+  --nb-offset-lg: 10px;
+
+  color-scheme: light;
+}
+
+@theme inline {
+  --color-paper: var(--paper);
+  --color-paper-2: var(--paper-2);
+  --color-ink: var(--ink);
+  --color-yellow: var(--yellow);
+  --color-pink: var(--pink);
+  --color-cyan: var(--cyan);
+  --color-violet: var(--violet);
+  --color-lime: var(--lime);
+  --color-orange: var(--orange);
+
+  --font-display: var(--font-archivo-black);
+  --font-sans: var(--font-space-grotesk);
+  --font-mono: var(--font-space-mono);
+
+  /* Hard shadows as first-class Tailwind utilities so `hover:shadow-nb-lg`
+     and friends work without hand-written variant CSS. */
+  --shadow-nb-xs: 3px 3px 0 var(--ink);
+  --shadow-nb: 6px 6px 0 var(--ink);
+  --shadow-nb-lg: 10px 10px 0 var(--ink);
+  --shadow-nb-xl: 16px 16px 0 var(--ink);
+  --shadow-nb-none: 0 0 0 var(--ink);
+}
+
+/*
+ * Everything below that isn't a bare `:root`/`@theme` token lives inside
+ * `@layer base` or `@layer components`. Tailwind's own utilities compile into
+ * an `utilities` layer that always outranks both — regardless of source
+ * order or selector specificity, since unlayered CSS wins over ALL layers.
+ * Leaving `.nb-panel` etc. unlayered (as they were) meant `bg-ink`, `bg-yellow`,
+ * `hover:bg-cyan` and friends could never actually override the panel's
+ * default white background: every `nb-panel` on the site silently rendered
+ * white no matter what `bg-*` utility was paired with it — which is exactly
+ * how a `bg-ink text-yellow` chip ended up showing yellow text on white.
+ * Layering restores the override Tailwind classes are supposed to have.
+ */
+
+@layer base {
+  * {
+    border-color: var(--ink);
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  /* Clears the sticky header when an in-page anchor lands. */
+  section[id],
+  article > [id] {
+    scroll-margin-top: 5.5rem;
+  }
+
+  body {
+    background: var(--paper);
+    color: var(--ink);
+    font-family: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
+    /* Neo-brutalism is a flat medium — kill the browser's tap highlight blur. */
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  ::selection {
+    background: var(--yellow);
+    color: var(--ink);
+  }
+
+  /* One loud, unmistakable focus state everywhere. Custom controls (the rail,
+     the filter chips) depend on this being impossible to miss. */
+  :focus-visible {
+    outline: var(--nb-border) solid var(--violet);
+    outline-offset: 3px;
+  }
+
+  h1,
+  h2,
+  h3,
+  .font-display {
+    font-family: var(--font-archivo-black), ui-sans-serif, system-ui, sans-serif;
+    font-weight: 400;
+    letter-spacing: -0.02em;
+    text-transform: uppercase;
+  }
+}
+
+@layer components {
+  /* ------------------------------------------------------------------------
+     Surfaces
+     ------------------------------------------------------------------------ */
+
+  /* The base object: a bordered slab. Everything visible is one of these.
+     No default background here — a `bg-*` utility supplies it, and because
+     this rule lives in `components` (below Tailwind's `utilities` layer) that
+     utility is guaranteed to win. `bg-white` is the plain default look, so
+     spell it out explicitly at call sites rather than relying on this class. */
+  .nb-panel {
+    border: var(--nb-border) solid var(--ink);
+  }
+
+  .nb-line {
+    border-width: var(--nb-border);
+    border-style: solid;
+    border-color: var(--ink);
+  }
+
+  /* Ruled divider matching the border weight. */
+  .nb-rule {
+    border-top: var(--nb-border) solid var(--ink);
+  }
+
+  /* --------------------------------------------------------------------------
+     Interactive — press-into-the-shadow. The object physically moves down-right
+     into its own shadow on click, which is the signature NB feedback.
+     -------------------------------------------------------------------------- */
+
+  .nb-press {
+    transition:
+      transform 120ms cubic-bezier(0.2, 0, 0, 1),
+      box-shadow 120ms cubic-bezier(0.2, 0, 0, 1),
+      background-color 120ms linear;
+  }
+
+  .nb-press:hover {
+    transform: translate(-2px, -2px);
+    box-shadow: var(--shadow-nb-lg);
+  }
+
+  .nb-press:active {
+    transform: translate(var(--nb-offset), var(--nb-offset));
+    box-shadow: 0 0 0 var(--ink);
+  }
+
+  /* Cards in the rail lift further and cast a longer shadow. */
+  .nb-lift {
+    transition:
+      transform 220ms cubic-bezier(0.22, 1, 0.36, 1),
+      box-shadow 220ms cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .nb-lift:hover {
+    transform: translate(-5px, -5px) rotate(var(--tilt, 0deg));
+    box-shadow: var(--shadow-nb-xl);
+  }
+
+  /* --------------------------------------------------------------------------
+     Type treatments
+     -------------------------------------------------------------------------- */
+
+  /* Outlined display type — used for the de-emphasised half of a headline. */
+  .nb-outline-text {
+    color: transparent;
+    -webkit-text-stroke: 2px var(--ink);
+    paint-order: stroke fill;
+  }
+
+  @media (min-width: 768px) {
+    .nb-outline-text {
+      -webkit-text-stroke-width: 3px;
+    }
+  }
+
+  /* Small mono label — the "spec sheet" voice used for all metadata. */
+  .nb-label {
+    font-family: var(--font-space-mono), ui-monospace, monospace;
+    font-size: 0.6875rem;
+    line-height: 1;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+  }
+
+  /* --------------------------------------------------------------------------
+     Backgrounds
+     -------------------------------------------------------------------------- */
+
+  .nb-grid-bg {
+    background-image:
+      linear-gradient(to right, rgba(10, 10, 10, 0.06) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(10, 10, 10, 0.06) 1px, transparent 1px);
+    background-size: 56px 56px;
+  }
+
+  .nb-dots-bg {
+    background-image: radial-gradient(var(--ink) 1.3px, transparent 1.3px);
+    background-size: 16px 16px;
+    opacity: 0.14;
+  }
+
+  /* Diagonal hazard stripes — used on edges and empty states. */
+  .nb-hazard {
+    background-image: repeating-linear-gradient(
+      -45deg,
+      var(--ink) 0 10px,
+      transparent 10px 20px
+    );
+  }
+
+  /* --------------------------------------------------------------------------
+     Marquee — the ticker band between sections.
+     Track holds the content twice; translating -50% loops seamlessly.
+     -------------------------------------------------------------------------- */
+
+  .nb-marquee-track {
+    display: flex;
+    width: max-content;
+    animation: nb-marquee var(--nb-marquee-duration, 32s) linear infinite;
+  }
+
+  .nb-marquee-track[data-direction="reverse"] {
+    animation-direction: reverse;
+  }
+
+  /* Pausing on hover lets people actually read a client name. */
+  .nb-marquee:hover .nb-marquee-track {
+    animation-play-state: paused;
+  }
+
+  /* --------------------------------------------------------------------------
+     Work rail — horizontal drag scroller.
+     -------------------------------------------------------------------------- */
+
+  .nb-rail {
+    /* Gutter and scroll-padding are driven by one variable so the snap position
+       and the visual inset can never drift apart across breakpoints. */
+    --rail-gutter: 1rem;
+    --card-h: clamp(280px, 44vh, 460px);
+    /* Card width is derived from --card-h and the artwork ratio, then clamped
+       to this so a landscape card can never fill the whole phone — the peek of
+       the next card is the only affordance telling you the rail scrolls. */
+    --card-max-w: 78vw;
+
+    display: flex;
+    gap: 1.25rem;
+    padding-inline: var(--rail-gutter);
+    scroll-padding-inline: var(--rail-gutter);
+    padding-block: 1.25rem;
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    /* `proximity`, not `mandatory`: card widths vary by aspect ratio, so a
+       mandatory snap would refuse to settle on the final card. */
+    scroll-snap-type: x proximity;
+    /* The rail owns its own scrollbar UI (the progress bar), so hide the native
+       one rather than letting it break the card edges. */
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+
+  .nb-rail::-webkit-scrollbar {
+    display: none;
+  }
+
+  @media (min-width: 640px) {
+    .nb-rail {
+      --rail-gutter: 1.5rem;
+      gap: 1.5rem;
+    }
+  }
+
+  @media (min-width: 640px) {
+    .nb-rail {
+      --card-max-w: 70vw;
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .nb-rail {
+      --rail-gutter: 2.5rem;
+      gap: 2rem;
+      --card-h: clamp(320px, 52vh, 540px);
+      --card-max-w: min(62vw, 660px);
+    }
+  }
+
+  /* Scoped to `[data-card]` so any non-card child can't become a snap target. */
+  .nb-rail > [data-card] {
+    scroll-snap-align: start;
+  }
+
+  /* While a pointer drag is in flight, snapping fights the drag — turn it off
+     and swap the cursor. Restored on pointer release. Note: children keep their
+     pointer events; a drag is distinguished from a click in `onClickCapture`. */
+  .nb-rail[data-dragging="true"] {
+    scroll-snap-type: none;
+    cursor: grabbing;
+    user-select: none;
+  }
+}
+
+@keyframes nb-marquee {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+  to {
+    transform: translate3d(-50%, 0, 0);
+  }
+}
+
+/* --------------------------------------------------------------------------
+   Motion preferences
+   -------------------------------------------------------------------------- */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  /* A looping marquee is the one thing that must fully stop, not just speed
+     up — reset it to its start position and leave it there. */
+  .nb-marquee-track {
+    animation: none !important;
+    transform: none !important;
+  }
+
+  .nb-press:hover,
+  .nb-lift:hover {
+    transform: none;
+  }
+}

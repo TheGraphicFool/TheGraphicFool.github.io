@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 1250" width="1000" height="1250">
+      <rect width="1000" height="1250" fill="#FFFFFF"/>
+      <defs><pattern id="hzquiet-hours-2" width="90" height="90" patternTransform="rotate(-45)" patternUnits="userSpaceOnUse"><rect width="45" height="90" fill="#FFE600"/></pattern></defs><rect x="0" y="925" width="1000" height="325" fill="url(#hzquiet-hours-2)"/>
+      <path transform="translate(40 40)" d="M 180 925 L 180 525 A 320 320 0 0 1 820 525 L 820 925 Z" fill="#0A0A0A" stroke="none" stroke-width="0" stroke-linejoin="miter"/><path transform="translate(0 0)" d="M 180 925 L 180 525 A 320 320 0 0 1 820 525 L 820 925 Z" fill="#FF3D8B" stroke="#0A0A0A" stroke-width="14" stroke-linejoin="miter"/>
+      <circle cx="524" cy="649" r="130" fill="#0A0A0A" stroke="none" stroke-width="0"/><circle cx="500" cy="625" r="130" fill="#7B4DFF" stroke="#0A0A0A" stroke-width="14"/>
+      <rect x="0" y="925" width="1000" height="14" fill="#0A0A0A"/>
+    </svg>
