@@ -3,13 +3,19 @@
 import { AnimatePresence, motion, useMotionValueEvent, useScroll } from "framer-motion";
 import { useState } from "react";
 
-/** Floating "up" button that appears once you're well past the hero. */
+/**
+ * Floating "up" button that appears once you're well past the hero, and
+ * gets out of the way again once the footer is on screen (on a phone it
+ * would otherwise sit on top of the footer's links and copyright line).
+ */
 export function BackToTop() {
   const { scrollY } = useScroll();
   const [visible, setVisible] = useState(false);
 
   useMotionValueEvent(scrollY, "change", (y) => {
-    const next = y > 900;
+    const footer = document.querySelector("footer");
+    const footerInView = footer ? footer.getBoundingClientRect().top < window.innerHeight - 24 : false;
+    const next = y > 900 && !footerInView;
     if (next !== visible) setVisible(next);
   });
 
@@ -27,7 +33,7 @@ export function BackToTop() {
             window.scrollTo({ top: 0, behavior: reduce ? "auto" : "smooth" });
           }}
           aria-label="Back to top"
-          className="nb-panel nb-press shadow-nb bg-lime hover:bg-yellow font-display fixed right-4 bottom-4 z-40 grid h-14 w-14 place-items-center text-2xl sm:right-6 sm:bottom-6"
+          className="nb-panel nb-press shadow-nb bg-lime hover:bg-yellow font-display fixed right-3 bottom-3 z-40 grid h-11 w-11 place-items-center text-xl sm:right-6 sm:bottom-6 sm:h-14 sm:w-14 sm:text-2xl"
         >
           ↑
         </motion.button>

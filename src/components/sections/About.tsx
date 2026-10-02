@@ -80,8 +80,8 @@ export function About() {
           <Reveal className="lg:col-span-5" delay={0.12} distance={30}>
             <div className="relative">
               <div className="absolute -top-5 -left-3 z-10 sm:-left-5">
-                <DragSticker rotate={6} className="bg-cyan">
-                  Say hello · drag me
+                <DragSticker rotate={6} className="bg-cyan" hint="drag me">
+                  Say hello
                 </DragSticker>
               </div>
 
