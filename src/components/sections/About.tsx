@@ -86,14 +86,51 @@ export function About() {
               </div>
 
               <div className="nb-panel shadow-nb-lg bg-white">
-                <div className="bg-violet border-ink relative aspect-[4/5] overflow-hidden border-b-[3px]">
+                {/*
+                  Social links pop onto the photo as stickers. With a mouse they
+                  spring up on hover (or keyboard focus); on touch screens,
+                  which can't hover, they're simply always shown.
+                */}
+                <div className="group bg-violet border-ink relative aspect-[4/5] overflow-hidden border-b-[3px]">
                   <Image
                     src="/portrait.webp"
                     alt={`Portrait of ${site.name}`}
                     fill
                     sizes="(min-width: 1024px) 40vw, 100vw"
-                    className="object-cover object-top"
+                    className="object-cover object-top transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] [@media(hover:hover)]:group-hover:scale-[1.03]"
                   />
+
+                  <span
+                    aria-hidden
+                    className="nb-label bg-ink text-paper absolute top-4 right-4 hidden px-2.5 py-1.5 font-bold transition-opacity duration-200 group-focus-within:opacity-0 group-hover:opacity-0 [@media(hover:hover)]:block"
+                  >
+                    Hover for links ↓
+                  </span>
+
+                  <ul className="absolute inset-x-3 bottom-3 flex flex-wrap justify-center gap-2.5 sm:inset-x-4 sm:bottom-4">
+                    {site.socials.map((social, i) => (
+                      <li
+                        key={social.label}
+                        style={{
+                          transitionDelay: `${i * 60}ms`,
+                          ["--r" as string]: `${[-4, 3, -2, 4][i % 4]}deg`,
+                        }}
+                        className="rotate-[var(--r)] transition-[opacity,transform] duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] [@media(hover:hover)]:translate-y-6 [@media(hover:hover)]:scale-75 [@media(hover:hover)]:opacity-0 [@media(hover:hover)]:group-focus-within:translate-y-0 [@media(hover:hover)]:group-focus-within:scale-100 [@media(hover:hover)]:group-focus-within:opacity-100 [@media(hover:hover)]:group-hover:translate-y-0 [@media(hover:hover)]:group-hover:scale-100 [@media(hover:hover)]:group-hover:opacity-100"
+                      >
+                        <a
+                          href={social.href}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className={`nb-panel nb-press shadow-nb font-display flex items-center gap-2 px-4 py-2.5 text-sm hover:bg-ink hover:text-yellow ${
+                            ["bg-yellow", "bg-lime", "bg-cyan", "bg-pink"][i % 4]
+                          }`}
+                        >
+                          {social.label}
+                          <span aria-hidden>↗</span>
+                        </a>
+                      </li>
+                    ))}
+                  </ul>
                 </div>
 
                 <div className="flex items-center justify-between gap-4 px-5 py-4">
@@ -101,25 +138,6 @@ export function About() {
                   <p className="nb-label opacity-55">{site.location}</p>
                 </div>
               </div>
-
-              {/* Socials */}
-              <ul className="mt-6 grid gap-3 sm:grid-cols-2">
-                {site.socials.map((social) => (
-                  <li key={social.label}>
-                    <a
-                      href={social.href}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="nb-panel nb-press shadow-nb-xs bg-white hover:bg-yellow flex items-center justify-between gap-3 px-4 py-3"
-                    >
-                      <span className="font-display text-sm">{social.label}</span>
-                      <span aria-hidden className="text-sm opacity-50">
-                        ↗
-                      </span>
-                    </a>
-                  </li>
-                ))}
-              </ul>
             </div>
           </Reveal>
         </div>

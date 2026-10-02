@@ -17,9 +17,11 @@ type RailCardProps = {
    * stagger and the alternating hover tilt. Resets naturally on refilter. */
   index: number;
   priority: boolean;
+  /** "rail" sizes the card for the horizontal scroller; "grid" fills its column. */
+  layout?: "rail" | "grid";
 };
 
-export function RailCard({ project, number, index, priority }: RailCardProps) {
+export function RailCard({ project, number, index, priority, layout = "rail" }: RailCardProps) {
   const cover = coverOf(project);
   const { width, height } = RATIO_DIMENSIONS[project.ratio];
   const cursor = useProjectCursor();
@@ -35,10 +37,13 @@ export function RailCard({ project, number, index, priority }: RailCardProps) {
      */
     <motion.article
       data-card
-      className="flex shrink-0 flex-col"
+      className={layout === "rail" ? "flex shrink-0 flex-col" : "flex min-w-0 flex-col"}
       style={
         {
-          width: `min(calc(var(--card-h) * ${(width / height).toFixed(4)}), var(--card-max-w))`,
+          // Rail: width follows the artwork ratio. Grid: the column decides.
+          width: layout === "rail"
+            ? `min(calc(var(--card-h) * ${(width / height).toFixed(4)}), var(--card-max-w))`
+            : undefined,
           "--tilt": tilt,
         } as CSSProperties
       }
@@ -60,14 +65,18 @@ export function RailCard({ project, number, index, priority }: RailCardProps) {
           {/* Media — fixed height, full card width, cropped to fit. */}
           <div
             className="border-ink relative w-full overflow-hidden border-b-[3px]"
-            style={{ height: "var(--card-h)" }}
+            style={layout === "rail" ? { height: "var(--card-h)" } : { aspectRatio: "1 / 1" }}
           >
             <Image
               src={cover.src}
               alt={`${project.title} — ${project.description}`}
               fill
               draggable={false}
-              sizes="(min-width: 1280px) 620px, (min-width: 640px) 55vw, 85vw"
+              sizes={
+                layout === "rail"
+                  ? "(min-width: 1280px) 620px, (min-width: 640px) 55vw, 85vw"
+                  : "(min-width: 1280px) 25vw, (min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
+              }
               className="object-cover transition-transform duration-500 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:scale-[1.04]"
               priority={priority}
             />

@@ -12,6 +12,7 @@ import { CursorProvider } from "./CustomCursor";
 import { Reveal } from "@/components/motion/Reveal";
 
 type Category = ProjectCategory | "All";
+type View = "grid" | "rail";
 
 /**
  * Convert vertical wheel movement into horizontal rail movement.
@@ -39,6 +40,9 @@ const INITIAL_METRICS: Metrics = {
 export function WorkRail() {
   const railRef = useRef<HTMLDivElement>(null);
   const [category, setCategory] = useState<Category>("All");
+  // Grid first: every project is visible at a glance. The rail is the
+  // browse-one-at-a-time alternative.
+  const [view, setView] = useState<View>("grid");
   const [metrics, setMetrics] = useState<Metrics>(INITIAL_METRICS);
 
   const drag = useRef({
@@ -73,6 +77,10 @@ export function WorkRail() {
         : numbered.filter((entry) => entry.project.category === category),
     [category, numbered]
   );
+
+  /** The rail element only exists in rail view with something to show; the
+   * effects below re-bind whenever it (re)mounts. */
+  const railMounted = view === "rail" && visible.length > 0;
 
   const measure = useCallback(() => {
     const el = railRef.current;
@@ -111,7 +119,7 @@ export function WorkRail() {
       observer.disconnect();
       if (frame.current) cancelAnimationFrame(frame.current);
     };
-  }, [measure, scheduleMeasure]);
+  }, [measure, scheduleMeasure, railMounted]);
 
   // A new filter shows a different set — start it from the left.
   useEffect(() => {
@@ -119,7 +127,7 @@ export function WorkRail() {
     if (!el) return;
     el.scrollTo({ left: 0, behavior: "auto" });
     measure();
-  }, [category, measure]);
+  }, [category, measure, railMounted]);
 
   const prefersReduced = () =>
     typeof window !== "undefined" &&
@@ -239,7 +247,7 @@ export function WorkRail() {
 
     el.addEventListener("wheel", onWheel, { passive: false });
     return () => el.removeEventListener("wheel", onWheel);
-  }, []);
+  }, [railMounted]);
 
   // --- Keyboard -----------------------------------------------------------
 
@@ -293,13 +301,40 @@ export function WorkRail() {
               </div>
             </Reveal>
 
-            <div className="mt-9">
+            <div className="mt-9 flex flex-wrap items-center justify-between gap-x-6 gap-y-4">
               <CategoryFilter
                 categories={categories}
                 active={category}
                 counts={counts}
                 onChange={setCategory}
               />
+
+              <div role="group" aria-label="Layout" className="flex items-center gap-2">
+                {(
+                  [
+                    { id: "grid", label: "Grid", icon: "▦" },
+                    { id: "rail", label: "Rail", icon: "⇆" },
+                  ] as const
+                ).map((option) => {
+                  const active = view === option.id;
+                  return (
+                    <button
+                      key={option.id}
+                      type="button"
+                      aria-pressed={active}
+                      onClick={() => setView(option.id)}
+                      className={`nb-panel nb-press font-display flex items-center gap-2 px-3.5 py-2.5 text-sm ${
+                        active
+                          ? "bg-pink shadow-nb-none translate-x-[3px] translate-y-[3px]"
+                          : "bg-white shadow-nb-xs hover:bg-yellow"
+                      }`}
+                    >
+                      <span aria-hidden>{option.icon}</span>
+                      {option.label}
+                    </button>
+                  );
+                })}
+              </div>
             </div>
           </div>
         </div>
@@ -314,6 +349,19 @@ export function WorkRail() {
                 Try another category.
               </p>
             </div>
+          </div>
+        ) : view === "grid" ? (
+          <div className="grid gap-6 px-4 py-8 sm:grid-cols-2 sm:px-6 lg:grid-cols-3 lg:gap-8 lg:px-10 lg:py-10 2xl:grid-cols-4">
+            {visible.map(({ project, number }, i) => (
+              <RailCard
+                key={project.id}
+                project={project}
+                number={number}
+                index={i}
+                priority={i < 4}
+                layout="grid"
+              />
+            ))}
           </div>
         ) : (
           <div
@@ -343,7 +391,7 @@ export function WorkRail() {
         )}
 
         {/* Controls */}
-        {visible.length > 0 && (
+        {visible.length > 0 && view === "rail" && (
           <div className="border-ink flex items-center gap-4 border-t-[3px] px-4 py-4 sm:px-6 lg:px-10">
             <div className="flex items-center gap-2">
               <button
