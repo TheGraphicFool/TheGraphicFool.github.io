@@ -38,10 +38,10 @@ export function Footer() {
           <div className="px-4 py-8 sm:px-6 lg:py-10">
             <p className="nb-label text-cyan mb-4">Navigate</p>
             <ul className="space-y-2 text-sm">
-              {["Work", "Services", "About", "Contact"].map((label) => (
+              {["Work", "Services", "About", "Contact", "Blog"].map((label) => (
                 <li key={label}>
                   <Link
-                    href={`/#${label.toLowerCase()}`}
+                    href={label === "Blog" ? "/blog" : `/#${label.toLowerCase()}`}
                     className="hover:text-yellow underline-offset-4 hover:underline"
                   >
                     {label}

@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="1000" viewBox="0 0 1600 1000">
+  <rect width="1600" height="1000" fill="#ffe600"/>
+  <g stroke="#0a0a0a" stroke-opacity="0.08" stroke-width="2">
+    <path d="M0 125H1600M0 250H1600M0 375H1600M0 500H1600M0 625H1600M0 750H1600M0 875H1600"/>
+    <path d="M200 0V1000M400 0V1000M600 0V1000M800 0V1000M1000 0V1000M1200 0V1000M1400 0V1000"/>
+  </g>
+  <rect x="160" y="230" width="1280" height="540" fill="#0a0a0a"/>
+  <rect x="140" y="210" width="1280" height="540" fill="#ff3d8b" stroke="#0a0a0a" stroke-width="10"/>
+  <text x="780" y="545" text-anchor="middle" font-family="Arial Black, Arial, sans-serif" font-weight="900" font-size="190" fill="#0a0a0a">HELLO</text>
+  <g transform="rotate(-8 1230 210)">
+    <rect x="1080" y="150" width="300" height="100" fill="#b8ff3d" stroke="#0a0a0a" stroke-width="8"/>
+    <text x="1230" y="215" text-anchor="middle" font-family="Courier New, monospace" font-weight="700" font-size="40" fill="#0a0a0a">POST 01</text>
+  </g>
+</svg>

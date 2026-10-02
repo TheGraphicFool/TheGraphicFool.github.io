@@ -3,9 +3,10 @@ import { useEffect, useState } from "react";
 /**
  * Returns the id of whichever of `ids` currently sits under the header band.
  * Ids that aren't on the page (e.g. on a case study) are simply ignored, so
- * this returns null there.
+ * this returns null there. Pass the current pathname so the observer re-binds
+ * after a client-side navigation back to the page that has the sections.
  */
-export function useActiveSection(ids: string[]) {
+export function useActiveSection(ids: string[], pathname: string) {
   const [active, setActive] = useState<string | null>(null);
   const key = ids.join("|");
 
@@ -28,7 +29,7 @@ export function useActiveSection(ids: string[]) {
     );
     elements.forEach((el) => observer.observe(el));
     return () => observer.disconnect();
-  }, [key]);
+  }, [key, pathname]);
 
   return active;
 }

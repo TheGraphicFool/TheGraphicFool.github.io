@@ -10,6 +10,8 @@
  *    `public/projects/<id>/`, and set `ratio` to match their aspect ratio.
  */
 
+import { site } from "./site";
+
 export type ProjectCategory =
   | "Identity"
   | "Packaging"
@@ -58,11 +60,15 @@ export type Project = {
   images: ProjectImage[];
   tags: string[];
   featured?: boolean;
+  /** Full Behance case study for this project. Until set, the button links to
+   * the Behance profile instead. */
+  behance?: string;
 };
 
 export const projects: Project[] = [
   {
     id: "fido-dido",
+    behance: "", // Paste the Behance case-study URL here.
     title: "Fido & Dido x 7up",
     category: "Concept",
     ratio: "square",
@@ -101,6 +107,7 @@ export const projects: Project[] = [
   },
   {
     id: "quiet-hours",
+    behance: "", // Paste the Behance case-study URL here.
     title: "Quiet Hours",
     category: "Editorial",
     ratio: "portrait",
@@ -132,6 +139,7 @@ export const projects: Project[] = [
   },
   {
     id: "north-field",
+    behance: "", // Paste the Behance case-study URL here.
     title: "North Field",
     category: "Identity",
     ratio: "landscape",
@@ -163,6 +171,7 @@ export const projects: Project[] = [
   },
   {
     id: "glass-market",
+    behance: "", // Paste the Behance case-study URL here.
     title: "Glass Market",
     category: "Campaigns",
     ratio: "landscape",
@@ -195,6 +204,7 @@ export const projects: Project[] = [
   },
   {
     id: "paper-trail",
+    behance: "", // Paste the Behance case-study URL here.
     title: "Paper Trail",
     category: "Editorial",
     ratio: "square",
@@ -226,6 +236,7 @@ export const projects: Project[] = [
   },
   {
     id: "coastline-radio",
+    behance: "", // Paste the Behance case-study URL here.
     title: "Coastline Radio",
     category: "Identity",
     ratio: "square",
@@ -257,6 +268,7 @@ export const projects: Project[] = [
   },
   {
     id: "midnight-transit",
+    behance: "", // Paste the Behance case-study URL here.
     title: "Midnight Transit",
     category: "Identity",
     ratio: "portrait",
@@ -288,6 +300,7 @@ export const projects: Project[] = [
   },
   {
     id: "citrus-press",
+    behance: "", // Paste the Behance case-study URL here.
     title: "Citrus Press",
     category: "Packaging",
     ratio: "square",
@@ -319,6 +332,7 @@ export const projects: Project[] = [
   },
   {
     id: "faultline",
+    behance: "", // Paste the Behance case-study URL here.
     title: "Faultline",
     category: "Campaigns",
     ratio: "square",
@@ -350,6 +364,7 @@ export const projects: Project[] = [
   },
   {
     id: "echo-chamber",
+    behance: "", // Paste the Behance case-study URL here.
     title: "Echo Chamber",
     category: "Campaigns",
     ratio: "square",
@@ -381,6 +396,7 @@ export const projects: Project[] = [
   },
   {
     id: "terra-nova",
+    behance: "", // Paste the Behance case-study URL here.
     title: "Terra Nova",
     category: "Identity",
     ratio: "landscape",
@@ -412,6 +428,7 @@ export const projects: Project[] = [
   },
   {
     id: "slow-current",
+    behance: "", // Paste the Behance case-study URL here.
     title: "Slow Current",
     category: "Editorial",
     ratio: "portrait",
@@ -443,6 +460,7 @@ export const projects: Project[] = [
   },
   {
     id: "static-bloom",
+    behance: "", // Paste the Behance case-study URL here.
     title: "Static Bloom",
     category: "Packaging",
     ratio: "square",
@@ -474,6 +492,7 @@ export const projects: Project[] = [
   },
   {
     id: "helio",
+    behance: "", // Paste the Behance case-study URL here.
     title: "Helio",
     category: "Identity",
     ratio: "landscape",
@@ -513,6 +532,11 @@ export const categories: (ProjectCategory | "All")[] = [
   "Campaigns",
   "Concept"
 ];
+
+/** The project's Behance case study, or the profile while `behance` is empty. */
+export function behanceOf(project: Project): string {
+  return project.behance || site.behance;
+}
 
 /** Cover image is always the first in the list. */
 export function coverOf(project: Project): ProjectImage {
