@@ -40,9 +40,8 @@ const INITIAL_METRICS: Metrics = {
 export function WorkRail() {
   const railRef = useRef<HTMLDivElement>(null);
   const [category, setCategory] = useState<Category>("All");
-  // Grid first: every project is visible at a glance. The rail is the
-  // browse-one-at-a-time alternative.
-  const [view, setView] = useState<View>("grid");
+  // Rail first; the grid toggle shows every project at a glance.
+  const [view, setView] = useState<View>("rail");
   const [metrics, setMetrics] = useState<Metrics>(INITIAL_METRICS);
 
   const drag = useRef({

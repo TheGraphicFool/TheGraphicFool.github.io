@@ -15,7 +15,7 @@ export function Contact() {
 
       <div className="relative mx-auto w-full max-w-[1800px] px-4 py-16 sm:px-6 sm:py-24 lg:px-10">
         <div className="grid items-center gap-8 lg:grid-cols-12">
-          <Reveal className="lg:col-span-7">
+          <Reveal className="relative z-10 lg:col-span-6">
             <p className="nb-label opacity-60">Contact</p>
 
             <h2
@@ -35,9 +35,13 @@ export function Contact() {
           </Reveal>
 
           {/* Decorative: an ASCII planet in the same ink as the headline. */}
-          <Reveal className="lg:col-span-5" delay={0.15}>
-            <div className="relative mx-auto aspect-square w-full max-w-[320px] sm:max-w-[420px] lg:max-w-[560px]">
-              <AsciiPlanet />
+          <Reveal className="lg:col-span-6" delay={0.15}>
+            {/* The canvas bleeds past its slot so the planet can be big
+                without pushing the headline around. */}
+            <div className="relative mx-auto aspect-square w-full max-w-[600px] lg:max-w-[720px]">
+              <div className="absolute -inset-[4%] sm:-inset-[8%] lg:-inset-[16%]">
+                <AsciiPlanet />
+              </div>
               <span className="nb-label pointer-events-none absolute right-0 bottom-0 opacity-50">
                 Drag to spin ⟲
               </span>
@@ -45,8 +49,9 @@ export function Contact() {
           </Reveal>
         </div>
 
-        {/* Email — the primary action, sized like it. */}
-        <Reveal delay={0.1}>
+        {/* Email — the primary action, sized like it. Stacked above the planet
+            canvas, which bleeds into this area. */}
+        <Reveal delay={0.1} className="relative z-10">
           <a
             href={`mailto:${site.email}`}
             className="nb-panel nb-press shadow-nb-lg bg-white hover:bg-pink font-display mt-10 flex flex-wrap items-center justify-between gap-4 px-5 py-6 text-[clamp(1.25rem,4.5vw,2.75rem)] leading-none break-all sm:px-8 sm:py-8"
@@ -62,7 +67,7 @@ export function Contact() {
           </div>
         </Reveal>
 
-        <div className="mt-12 grid gap-6 lg:grid-cols-12 lg:gap-8">
+        <div className="relative z-10 mt-12 grid gap-6 lg:grid-cols-12 lg:gap-8">
           <Reveal delay={0.12} className="lg:col-span-8">
             <BriefBuilder />
           </Reveal>

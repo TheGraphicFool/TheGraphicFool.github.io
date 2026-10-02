@@ -3,37 +3,45 @@
 import { useEffect, useRef } from "react";
 
 /**
- * A ringed planet with an orbiting moon, ray-cast per character cell and
- * drawn as ASCII — a tiny software "shader" on a 2D canvas, no WebGL or 3D
- * library needed. Rendered in the page's ink colour so it reads as part of
- * the type. Drag to spin it. Pauses off-screen; holds still under
- * prefers-reduced-motion.
+ * A ringed planet with an orbiting moon and a starfield, ray-cast per
+ * character cell and drawn as ASCII — a small software "shader" on a 2D
+ * canvas, no WebGL or 3D library needed. Rendered in the page's ink colour so
+ * it reads as part of the type. Drag to spin it. Pauses off-screen; holds
+ * still under prefers-reduced-motion.
+ *
+ * Detail comes only from character choice: a 70-step density ramp for the
+ * bodies, a sparser ramp for the ring dust, and a few glyphs for stars.
  */
 
-/** Dark → bright. The first char is a space so unlit cells stay empty. */
-const RAMP = " .,:;-=+*%#@";
-const RING_RAMP = " .:-=+*";
+/** Dark → bright, by visual ink density. Leading space = empty cell. */
+const RAMP =
+  " .'`^\",:;Il!i><~+_-?][}{1)(|\\/tfjrxnuvczXYUJCLQ0OZmwqpdbkhao*#MW&8%B@$";
+const RING_RAMP = " .,:;-=+*#";
+const STAR_GLYPHS = [".", "'", "+", "*", "+"];
 
-const CELL_W = 7; // px per column at 1x
+const CELL_W = 7; // px per column at 1x — character size stays fixed
 const CELL_H = 12; // px per row at 1x
 const FPS = 30;
 
-const PLANET_R = 0.6;
-const RING_IN = 0.82;
-const RING_OUT = 1.14;
-const MOON_R = 0.11;
-const MOON_ORBIT = 1.24;
+const PLANET_R = 0.72;
+const RING_IN = 0.86;
+const RING_OUT = 1.3;
+const MOON_R = 0.12;
+const MOON_ORBIT = 1.42;
 const TILT = 0.42; // axial / ring tilt, radians
+const SCENE_EXTENT = 1.42; // scene units from centre to the canvas edge
 
 /** Light comes from the upper left, slightly towards the viewer. */
-const LIGHT = normalize([-0.55, 0.55, 0.62]);
+const LIGHT = normalize([-0.62, 0.5, 0.6]);
+/** Half-vector for the specular highlight (viewer is +z). */
+const HALF = normalize([LIGHT[0], LIGHT[1], LIGHT[2] + 1]);
 
 function normalize([x, y, z]: number[]): [number, number, number] {
   const l = Math.hypot(x, y, z) || 1;
   return [x / l, y / l, z / l];
 }
 
-/** Cheap deterministic value noise on the sphere's surface coordinates. */
+/** Cheap deterministic value noise. */
 function hash(x: number, y: number) {
   const s = Math.sin(x * 127.1 + y * 311.7) * 43758.5453;
   return s - Math.floor(s);
@@ -51,10 +59,18 @@ function noise(x: number, y: number) {
   const d = hash(xi + 1, yi + 1);
   return a + (b - a) * u + (c - a) * v + (a - b - c + d) * u * v;
 }
+/** Three octaves of noise — enough turbulence for cloud bands. */
+function fbm(x: number, y: number) {
+  return noise(x, y) * 0.55 + noise(x * 2.1, y * 2.1) * 0.3 + noise(x * 4.3, y * 4.3) * 0.15;
+}
 
 function charFor(ramp: string, value: number) {
   const i = Math.max(0, Math.min(ramp.length - 1, Math.floor(value * ramp.length)));
   return ramp[i];
+}
+
+function clamp01(v: number) {
+  return v < 0 ? 0 : v > 1 ? 1 : v;
 }
 
 export function AsciiPlanet({ className = "" }: { className?: string }) {
@@ -75,20 +91,37 @@ export function AsciiPlanet({ className = "" }: { className?: string }) {
     let rows = 0;
     let dpr = 1;
     let spin = 0; // planet rotation (radians)
-    let orbit = 0; // moon / ring-texture phase
-    let velocity = 0.35; // radians per second
+    let clock = 0; // seconds; drives moon orbit, ring drift, star twinkle
+    let velocity = 0.3; // radians per second
     let visible = true;
     let raf = 0;
     let last = 0;
     let dragging = false;
     let dragX = 0;
 
-    // Planet tilt as a rotation about the view (z) axis.
     const cosT = Math.cos(TILT);
     const sinT = Math.sin(TILT);
-    // Ring plane normal: mostly "up" (the planet's axis), tipped ~20° towards
-    // the viewer so the ring reads as a thin tilted ellipse, Saturn-style.
+    // Ring plane normal = the planet's axis, tipped ~20° towards the viewer so
+    // the ring reads as a thin tilted ellipse.
     const ringN = normalize([-sinT * 0.94, cosT * 0.94, 0.34]);
+
+    /** Does a ray from point p towards the light cross the ring? (shadowing) */
+    function ringBlocksLight(x: number, y: number, z: number) {
+      const denom = ringN[0] * LIGHT[0] + ringN[1] * LIGHT[1] + ringN[2] * LIGHT[2];
+      if (Math.abs(denom) < 1e-4) return false;
+      const t = -(ringN[0] * x + ringN[1] * y + ringN[2] * z) / denom;
+      if (t <= 0) return false;
+      const d = Math.hypot(x + LIGHT[0] * t, y + LIGHT[1] * t, z + LIGHT[2] * t);
+      return d > RING_IN && d < RING_OUT && !(d > 1.06 && d < 1.11);
+    }
+
+    /** Does the planet block the light reaching point p? */
+    function planetBlocksLight(x: number, y: number, z: number) {
+      const b = x * LIGHT[0] + y * LIGHT[1] + z * LIGHT[2];
+      if (b > 0) return false; // already on the lit side of the centre
+      const c = x * x + y * y + z * z - PLANET_R * PLANET_R;
+      return b * b - c > 0;
+    }
 
     function resize() {
       const rect = canvas!.getBoundingClientRect();
@@ -111,16 +144,17 @@ export function AsciiPlanet({ className = "" }: { className?: string }) {
 
       const cellW = w / cols;
       const cellH = h / rows;
-      // Keep the scene square in screen space whatever the cell aspect is,
-      // with a margin so the ring and moon never clip at the edges.
-      const span = Math.min(w, h) / 2 / 1.42;
+      const span = Math.min(w, h) / 2 / SCENE_EXTENT;
 
-      // Moon position: orbits in (roughly) the ring plane.
-      const mAngle = orbit * 0.6;
+      // Moon: orbits in (roughly) the ring plane, slowly.
+      const mAngle = clock * 0.35;
       const mx0 = Math.cos(mAngle) * MOON_ORBIT;
       const mz0 = Math.sin(mAngle) * MOON_ORBIT;
       const my0 = -mz0 * 0.36;
       const moon = [mx0 * cosT - my0 * sinT, mx0 * sinT + my0 * cosT, mz0];
+
+      const ringDrift = clock * 0.12;
+      const twinkle = Math.floor(clock * 3);
 
       for (let r = 0; r < rows; r++) {
         let line = "";
@@ -131,25 +165,55 @@ export function AsciiPlanet({ className = "" }: { className?: string }) {
           let ch = " ";
           let depth = -Infinity;
 
-          // --- Planet ---
+          // --- Planet ------------------------------------------------------
           const d2 = px * px + py * py;
           if (d2 < PLANET_R * PLANET_R) {
             const pz = Math.sqrt(PLANET_R * PLANET_R - d2);
             const nx = px / PLANET_R;
             const ny = py / PLANET_R;
             const nz = pz / PLANET_R;
-            // Undo the tilt to get body-space coords, then spin about y.
+
+            // Body space: undo the axial tilt, then spin about the axis.
             const bx = nx * cosT + ny * sinT;
             const by = -nx * sinT + ny * cosT;
             const lon = Math.atan2(bx, nz) + spin;
-            const lat = Math.asin(Math.max(-1, Math.min(1, by)));
-            const bands = 0.5 + 0.5 * Math.sin(lat * 9 + noise(lon * 1.5, lat * 3) * 2.2);
-            const storms = noise(lon * 3 + 10, lat * 6) > 0.72 ? 0.35 : 0;
-            const surface = 0.55 + 0.35 * bands + storms;
-            const diffuse = Math.max(0, nx * LIGHT[0] + ny * LIGHT[1] + nz * LIGHT[2]);
-            const rim = Math.pow(1 - nz, 3) * 0.25;
-            ch = charFor(RAMP, Math.min(1, (0.08 + diffuse * 0.92) * surface + rim));
+            const lat = Math.asin(clamp01((by + 1) / 2) * 2 - 1);
+
+            // Turbulent latitude bands.
+            const turb = fbm(lon * 1.6, lat * 4.5);
+            const bands = 0.5 + 0.5 * Math.sin(lat * 11 + turb * 3.2);
+            const fine = 0.5 + 0.5 * Math.sin(lat * 38 + turb * 6);
+            let albedo = 0.45 + 0.3 * bands + 0.12 * fine;
+
+            // A great storm: an oval vortex riding one band.
+            const sLon = Math.atan2(Math.sin(lon - 1.2), Math.cos(lon - 1.2));
+            const sLat = lat + 0.38;
+            const storm = (sLon * sLon) / 0.09 + (sLat * sLat) / 0.012;
+            if (storm < 1) {
+              const swirl = 0.5 + 0.5 * Math.sin(storm * 9 + sLon * 4);
+              albedo = 0.35 + 0.55 * swirl;
+            }
+
+            // Pale polar caps.
+            if (Math.abs(lat) > 1.15) albedo = Math.max(albedo, 0.85 - (1.57 - Math.abs(lat)) * 0.4);
+
+            const nDotL = nx * LIGHT[0] + ny * LIGHT[1] + nz * LIGHT[2];
+            const diffuse = Math.max(0, nDotL);
+            // Soft terminator so the night side isn't a hard edge.
+            const terminator = clamp01((nDotL + 0.12) / 0.3);
+            const spec = Math.pow(Math.max(0, nx * HALF[0] + ny * HALF[1] + nz * HALF[2]), 28);
+            const rim = Math.pow(1 - nz, 2.5) * 0.35 * terminator;
+
+            // Ambient floor: the night side stays faintly drawn (earthshine), so
+            // the sphere's full outline always reads.
+            let shade = (0.2 + diffuse * 0.8 * terminator) * albedo + spec * 0.45 + rim;
+            if (ringBlocksLight(px, py, pz)) shade *= 0.35; // ring shadow band
+            ch = charFor(RAMP, clamp01(shade));
             depth = pz;
+          } else if (d2 < (PLANET_R + 0.035) * (PLANET_R + 0.035)) {
+            // Thin atmospheric halo just past the limb, brighter on the lit side.
+            const lit = (px * LIGHT[0] + py * LIGHT[1]) / Math.sqrt(d2);
+            if (lit > -0.2) ch = lit > 0.45 ? ":" : ".";
           }
 
           // --- Ring --- (intersect the view ray with the ring plane)
@@ -157,21 +221,25 @@ export function AsciiPlanet({ className = "" }: { className?: string }) {
           if (rz > depth) {
             const dist = Math.hypot(px, py, rz);
             if (dist > RING_IN && dist < RING_OUT) {
-              // Gaps and grooves, plus streaks that travel round the ring.
               const t = (dist - RING_IN) / (RING_OUT - RING_IN);
-              const grooves = 0.5 + 0.5 * Math.sin(t * 34);
-              const gap = t > 0.55 && t < 0.62 ? 0 : 1;
-              const angle = Math.atan2(rz, px) - orbit * 0.25;
-              const streak = 0.6 + 0.4 * Math.sin(angle * 9);
-              const shade = gap * (0.35 + 0.65 * grooves) * streak;
-              if (shade > 0.05) {
-                ch = charFor(RING_RAMP, shade);
+              // Ringlets of different density, plus a dark division.
+              const ringlets = 0.55 + 0.45 * Math.sin(t * 52) * Math.sin(t * 13 + 1);
+              const bandDensity = t < 0.18 ? 0.45 : t < 0.46 ? 1 : t < 0.55 ? 0.05 : t < 0.85 ? 0.8 : 0.35;
+              const angle = Math.atan2(rz, px);
+              const dust = 0.75 + 0.25 * hash(Math.floor(angle * 40 + ringDrift * 40), Math.floor(t * 30));
+              let shade = bandDensity * ringlets * dust;
+              if (planetBlocksLight(px, py, rz)) shade *= 0.25; // planet's shadow on the ring
+              // Over the planet, only the dense ringlets cover it; it shows
+              // through the thin ones and the division.
+              const threshold = depth > -Infinity ? 0.5 : 0.06;
+              if (shade > threshold) {
+                ch = charFor(RING_RAMP, clamp01(shade));
                 depth = rz;
               }
             }
           }
 
-          // --- Moon ---
+          // --- Moon --------------------------------------------------------
           const mdx = px - moon[0];
           const mdy = py - moon[1];
           const md2 = mdx * mdx + mdy * mdy;
@@ -182,8 +250,21 @@ export function AsciiPlanet({ className = "" }: { className?: string }) {
               const ny = mdy / MOON_R;
               const nz = Math.sqrt(Math.max(0, 1 - nx * nx - ny * ny));
               const diffuse = Math.max(0, nx * LIGHT[0] + ny * LIGHT[1] + nz * LIGHT[2]);
-              ch = charFor(RAMP, 0.15 + diffuse * 0.85);
+              const craters = noise(nx * 5 + 3, ny * 5 + 7) > 0.68 ? 0.55 : 1;
+              let shade = (0.08 + diffuse * 0.92) * (0.6 + 0.4 * noise(nx * 9, ny * 9)) * craters;
+              if (planetBlocksLight(moon[0] + mdx, moon[1] + mdy, mz)) shade *= 0.2; // eclipse
+              ch = charFor(RAMP, clamp01(shade));
               depth = mz;
+            }
+          }
+
+          // --- Stars: sparse, twinkling, only in empty sky -----------------
+          if (ch === " ") {
+            const s = hash(c * 1.37, r * 2.11);
+            if (s > 0.99) {
+              const phase = hash(c + twinkle * 0.13, r);
+              const g = phase > 0.8 ? STAR_GLYPHS[2 + Math.floor((s - 0.99) * 300) % 3] : STAR_GLYPHS[phase > 0.35 ? 1 : 0];
+              ch = g;
             }
           }
 
@@ -200,9 +281,9 @@ export function AsciiPlanet({ className = "" }: { className?: string }) {
       if (now - last < 1000 / FPS) return;
       const dt = last ? Math.min(0.1, (now - last) / 1000) : 0;
       last = now;
-      if (!dragging) velocity += (0.35 - velocity) * Math.min(1, dt * 1.5); // ease back to cruise
+      if (!dragging) velocity += (0.3 - velocity) * Math.min(1, dt * 1.5); // ease back to cruise
       spin += velocity * dt;
-      orbit += dt;
+      clock += dt;
       draw();
     }
 
@@ -254,7 +335,7 @@ export function AsciiPlanet({ className = "" }: { className?: string }) {
     <canvas
       ref={canvasRef}
       role="img"
-      aria-label="A rotating ringed planet with a small moon, drawn in ASCII characters"
+      aria-label="A rotating ringed planet with a small moon among stars, drawn in ASCII characters"
       title="Drag to spin"
       className={`block h-full w-full cursor-grab touch-pan-y select-none active:cursor-grabbing ${className}`}
     />
