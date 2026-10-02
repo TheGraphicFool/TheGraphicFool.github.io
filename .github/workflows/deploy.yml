@@ -68,10 +68,22 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
+          runs() {
+            gh api "repos/${{ github.repository }}/actions/runs?head_sha=${{ github.sha }}&per_page=100" \
+              --jq "[.workflow_runs[] | select(.path | startswith(\"dynamic/pages\")) $1] | length"
+          }
+          if [ "$(runs '')" = "0" ]; then
+            echo "No branch-based Pages build for this commit; deploying."
+            exit 0
+          fi
           for attempt in $(seq 1 36); do
-            pending=$(gh api "repos/${{ github.repository }}/actions/runs?head_sha=${{ github.sha }}&per_page=100" \
-              --jq '[.workflow_runs[] | select(.path | startswith("dynamic/pages")) | select(.status != "completed")] | length')
-            if [ "$pending" = "0" ]; then exit 0; fi
+            if [ "$(runs '| select(.status != "completed")')" = "0" ]; then
+              # The run reports "completed" a little before GitHub actually
+              # publishes it, so give that publish time to land first.
+              echo "Branch-based build finished; letting it publish before overwriting it."
+              sleep 90
+              exit 0
+            fi
             echo "Branch-based Pages build still running; waiting..."
             sleep 10
           done
@@ -79,3 +91,18 @@ jobs:
 
       - id: deployment
         uses: actions/deploy-pages@v4
+
+      # Fail loudly (red X in Actions) if the live site still isn't ours,
+      # instead of silently leaving the README up.
+      - name: Check the live site is the portfolio
+        run: |
+          for attempt in $(seq 1 12); do
+            if curl -fsSL "https://thegraphicfool.github.io/?check=${{ github.run_id }}-$attempt" | grep -q 'og.png'; then
+              echo "Live site is the portfolio."
+              exit 0
+            fi
+            echo "Live site not updated yet; checking again..."
+            sleep 15
+          done
+          echo "::error::thegraphicfool.github.io is not serving the portfolio. Set Settings → Pages → Source to 'GitHub Actions', then re-run this workflow."
+          exit 1
