@@ -1,6 +1,7 @@
 /**
- * Turns full-resolution artwork in artwork/<project>/ into web-sized WebP
- * files in public/projects/<project>/.
+ * Turns full-resolution artwork into web-sized WebP files:
+ *   artwork/blog/*       → public/blog/*         (blog covers)
+ *   artwork/<project>/*  → public/projects/<project>/*
  *
  * The site is a static export (GitHub Pages), so there's no on-demand image
  * optimizer — whatever sits in public/ is exactly what visitors download.
@@ -15,6 +16,8 @@ import sharp from "sharp";
 
 const SOURCE = path.resolve("artwork");
 const TARGET = path.resolve("public/projects");
+const BLOG_SOURCE = path.join(SOURCE, "blog");
+const BLOG_TARGET = path.resolve("public/blog");
 const MAX_WIDTH = 2000;
 const QUALITY = 82;
 
@@ -27,8 +30,10 @@ async function* walk(dir) {
 }
 
 for await (const file of walk(SOURCE)) {
-  const out = path
-    .join(TARGET, path.relative(SOURCE, file))
+  const isBlog = file.startsWith(BLOG_SOURCE + path.sep);
+  const out = (isBlog
+    ? path.join(BLOG_TARGET, path.relative(BLOG_SOURCE, file))
+    : path.join(TARGET, path.relative(SOURCE, file)))
     .replace(/\.(png|jpe?g)$/i, ".webp");
   await mkdir(path.dirname(out), { recursive: true });
   const exists = await stat(out).catch(() => null);
@@ -38,5 +43,5 @@ for await (const file of walk(SOURCE)) {
     .resize({ width: MAX_WIDTH, withoutEnlargement: true })
     .webp({ quality: QUALITY })
     .toFile(out);
-  console.log(`${path.relative(TARGET, out)}  ${info.width}×${info.height}  ${(info.size / 1024).toFixed(0)} KB`);
+  console.log(`${path.relative("public", out)}  ${info.width}×${info.height}  ${(info.size / 1024).toFixed(0)} KB`);
 }

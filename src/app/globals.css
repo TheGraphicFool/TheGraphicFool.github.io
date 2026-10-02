@@ -371,3 +371,79 @@
     transform: rotate(4deg);
   }
 }
+
+/* --------------------------------------------------------------------------
+   Blog post body — styles the HTML rendered from Markdown.
+   -------------------------------------------------------------------------- */
+
+@layer components {
+  .nb-prose {
+    font-size: 1.0625rem;
+    line-height: 1.75;
+  }
+  .nb-prose > * + * {
+    margin-top: 1.25em;
+  }
+  .nb-prose h2,
+  .nb-prose h3 {
+    margin-top: 2em;
+    line-height: 1;
+  }
+  .nb-prose h2 {
+    font-size: 1.875rem;
+    border-bottom: var(--nb-border) solid var(--ink);
+    padding-bottom: 0.4em;
+  }
+  .nb-prose h3 {
+    font-size: 1.375rem;
+  }
+  .nb-prose a {
+    text-decoration: underline;
+    text-decoration-thickness: 2px;
+    text-underline-offset: 3px;
+  }
+  .nb-prose a:hover {
+    background: var(--yellow);
+  }
+  .nb-prose ul,
+  .nb-prose ol {
+    padding-left: 1.4em;
+  }
+  .nb-prose ul {
+    list-style: square;
+  }
+  .nb-prose ol {
+    list-style: decimal;
+  }
+  .nb-prose blockquote {
+    border-left: 6px solid var(--pink);
+    padding-left: 1em;
+    font-size: 1.2em;
+  }
+  .nb-prose img {
+    border: var(--nb-border) solid var(--ink);
+    box-shadow: var(--shadow-nb);
+    width: 100%;
+    height: auto;
+  }
+  .nb-prose code {
+    font-family: var(--font-space-mono), ui-monospace, monospace;
+    font-size: 0.9em;
+    background: var(--paper-2);
+    padding: 0.1em 0.35em;
+  }
+  .nb-prose pre {
+    border: var(--nb-border) solid var(--ink);
+    background: var(--ink);
+    color: var(--paper);
+    padding: 1em;
+    overflow-x: auto;
+  }
+  .nb-prose pre code {
+    background: none;
+    padding: 0;
+  }
+  .nb-prose hr {
+    border-top: var(--nb-border) solid var(--ink);
+  }
+}

@@ -36,6 +36,9 @@ export const site = {
   availableFrom: "Q4 2026",
   available: true,
 
+  /** Behance profile — the fallback for any project without its own `behance` link. */
+  behance: "https://www.behance.net/AliRogue",
+
   /** [DRAFT] Delete any you don't use — the UI adapts to the list length. */
   socials: [
     { label: "Instagram", handle: "@example", href: "https://instagram.com/example" },

@@ -3,6 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import {
+  behanceOf,
   coverOf,
   getNeighbours,
   getProject,
@@ -12,6 +13,7 @@ import {
 import { ACCENT_BG, ACCENT_TEXT } from "@/lib/accents";
 import { Marquee } from "@/components/ui/Marquee";
 import { Gallery } from "@/components/interactive/Gallery";
+import { BehanceButton } from "@/components/ui/BehanceButton";
 import { site } from "@/data/site";
 
 /** Every project is known at build time — prerender the lot. */
@@ -93,6 +95,9 @@ export default async function CaseStudyPage(props: PageProps<"/work/[slug]">) {
           <p className="mt-6 max-w-2xl text-lg leading-relaxed sm:text-xl">
             {project.description}
           </p>
+          <div className="mt-8">
+            <BehanceButton href={behanceOf(project)} />
+          </div>
         </div>
       </header>
 
@@ -258,12 +263,15 @@ export default async function CaseStudyPage(props: PageProps<"/work/[slug]">) {
             <br />
             like this?
           </h2>
-          <a
-            href={`mailto:${site.email}`}
-            className="nb-panel nb-press shadow-nb bg-white hover:bg-cyan font-display inline-flex items-center gap-3 px-6 py-4 text-base sm:text-lg"
-          >
-            Start a project <span aria-hidden>→</span>
-          </a>
+          <div className="flex flex-wrap gap-4">
+            <BehanceButton href={behanceOf(project)} label="Full case study" />
+            <a
+              href={`mailto:${site.email}`}
+              className="nb-panel nb-press shadow-nb bg-white hover:bg-cyan font-display inline-flex items-center gap-3 px-6 py-4 text-base sm:text-lg"
+            >
+              Start a project <span aria-hidden>→</span>
+            </a>
+          </div>
         </div>
       </div>
     </article>

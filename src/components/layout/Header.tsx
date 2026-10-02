@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { site } from "@/data/site";
 import { useLockBodyScroll } from "@/hooks/useLockBodyScroll";
@@ -13,13 +14,25 @@ const NAV = [
   { label: "Services", href: "/#services" },
   { label: "About", href: "/#about" },
   { label: "Contact", href: "/#contact" },
+  { label: "Blog", href: "/blog" },
 ];
+
+/** Section ids for the in-page entries ("/#work" → "work"). */
+const SECTION_IDS = NAV.filter((item) => item.href.startsWith("/#")).map((item) =>
+  item.href.slice(2)
+);
 
 export function Header() {
   const [open, setOpen] = useState(false);
 
   useLockBodyScroll(open);
-  const active = useActiveSection(NAV.map((item) => item.href.slice(2)));
+  // trailingSlash is on, so normalise "/blog/" → "/blog".
+  const pathname = usePathname().replace(/(.)\/$/, "$1");
+  const section = useActiveSection(SECTION_IDS, pathname);
+  const isCurrent = (href: string) =>
+    href.startsWith("/#")
+      ? pathname === "/" && section === href.slice(2)
+      : pathname === href || pathname.startsWith(`${href}/`);
 
   // Note: the panel closes from each link's own onClick rather than a
   // pathname effect — same result, without a render cascade on every nav.
@@ -49,7 +62,7 @@ export function Header() {
               {site.shortName}
             </span>
             {/* Role is the first thing to go when space gets tight. */}
-            <span className="nb-label mt-1 hidden opacity-60 sm:block">
+            <span className="nb-label mt-1 hidden whitespace-nowrap opacity-60 sm:block">
               {site.role}
             </span>
           </span>
@@ -58,13 +71,13 @@ export function Header() {
         {/* Desktop nav */}
         <nav className="hidden items-stretch lg:flex" aria-label="Main">
           {NAV.map((item) => {
-            const isActive = active === item.href.slice(2);
+            const isActive = isCurrent(item.href);
             return (
               <Link
                 key={item.href}
                 href={item.href}
-                aria-current={isActive ? "location" : undefined}
-                className={`border-ink font-display flex items-center gap-2 border-l-[3px] px-7 text-sm transition-colors last:border-r-[3px] ${
+                aria-current={isActive ? (item.href.startsWith("/#") ? "location" : "page") : undefined}
+                className={`border-ink font-display flex items-center gap-2 border-l-[3px] px-5 text-sm xl:px-7 transition-colors last:border-r-[3px] ${
                   isActive ? "bg-ink text-yellow" : "hover:bg-yellow"
                 }`}
               >
@@ -84,7 +97,7 @@ export function Header() {
 
           <Link
             href="/#contact"
-            className="border-ink bg-pink text-ink font-display hidden items-center border-l-[3px] px-6 text-sm transition-colors hover:bg-cyan sm:flex"
+            className="border-ink bg-pink text-ink font-display hidden items-center border-l-[3px] px-6 text-sm whitespace-nowrap transition-colors hover:bg-cyan sm:flex"
           >
             Get in touch
           </Link>

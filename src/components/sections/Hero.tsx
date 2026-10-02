@@ -45,10 +45,10 @@ export function Hero() {
           clips it at desktop widths.
         */}
         <h1 className="mt-6 text-[clamp(2.75rem,11.5vw,10.5rem)] leading-[0.82]">
-          <motion.span {...slam(0.06, 34)} className="block overflow-hidden">
+          <motion.span {...slam(0.06, 34)} className="block">
             <BouncyText text="Muhammad" />
           </motion.span>
-          <motion.span {...slam(0.14, 34)} className="block overflow-hidden">
+          <motion.span {...slam(0.14, 34)} className="block">
             <BouncyText text="Ali" />{" "}
             <BouncyText text="Zahid" className="nb-outline-text" />
           </motion.span>
