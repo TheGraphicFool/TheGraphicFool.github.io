@@ -1,3 +1,4 @@
+import Image from "next/image";
 import { site } from "@/data/site";
 import { DragSticker } from "@/components/interactive/DragSticker";
 import { Reveal } from "@/components/motion/Reveal";
@@ -64,23 +65,14 @@ export function About() {
               </div>
 
               <div className="nb-panel shadow-nb-lg bg-white">
-                {/*
-                  Placeholder portrait. Swap this block for:
-                  <Image src="/portrait.jpg" alt="" width={1000} height={1250} />
-                */}
-                <div className="bg-violet border-ink relative grid aspect-[4/5] place-items-center border-b-[3px]">
-                  <div
-                    aria-hidden
-                    className="nb-grid-bg absolute inset-0 opacity-40"
+                <div className="bg-violet border-ink relative aspect-[4/5] overflow-hidden border-b-[3px]">
+                  <Image
+                    src="/portrait.webp"
+                    alt={`Portrait of ${site.name}`}
+                    fill
+                    sizes="(min-width: 1024px) 40vw, 100vw"
+                    className="object-cover object-top"
                   />
-                  <div className="relative text-center">
-                    <p className="font-display text-white text-[clamp(4rem,10vw,7rem)] leading-none">
-                      {site.initials}
-                    </p>
-                    <p className="nb-label mt-4 text-white opacity-70">
-                      Portrait goes here
-                    </p>
-                  </div>
                 </div>
 
                 <div className="flex items-center justify-between gap-4 px-5 py-4">
