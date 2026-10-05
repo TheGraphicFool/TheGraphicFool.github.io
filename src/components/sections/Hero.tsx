@@ -8,7 +8,6 @@ import { BouncyText } from "@/components/interactive/BouncyText";
 import { ColorBlock } from "@/components/interactive/ColorBlock";
 import { DragSticker } from "@/components/interactive/DragSticker";
 import { Tilt } from "@/components/interactive/Tilt";
-import { HeroKeyboard } from "@/components/interactive/HeroKeyboard";
 
 const EASE = [0.16, 1, 0.3, 1] as const;
 
@@ -42,28 +41,28 @@ export function Hero() {
           <p className="nb-label opacity-60">{site.location}</p>
         </motion.div>
 
-        {/* Centrepiece: the brand as a playable mechanical keyboard. */}
-        <motion.div {...slam(0.05, 40)} className="mt-8 sm:mt-10">
-          <HeroKeyboard />
-          <p className="nb-label mt-6 text-center opacity-55">
-            <span className="hidden sm:inline">Type on your keyboard or click the keys</span>
-            <span className="sm:hidden">Tap the keys</span>
-            {" · try F-O-O-L"}
-          </p>
-        </motion.div>
+        {/*
+          The name gets the full container width. Sized so the longest line
+          ("Muhammad") still fits at every breakpoint — a narrower track here
+          clips it at desktop widths.
+        */}
+        <h1 className="mt-6 text-[clamp(2.75rem,11.5vw,10.5rem)] leading-[0.82]">
+          <motion.span {...slam(0.06, 34)} className="block">
+            <BouncyText text="Muhammad" />
+          </motion.span>
+          <motion.span {...slam(0.14, 34)} className="block">
+            <BouncyText text="Ali" />{" "}
+            <BouncyText text="Zahid" className="nb-outline-text" />
+          </motion.span>
+        </h1>
 
         <div className="grid gap-12 pt-10 pb-14 lg:grid-cols-12 lg:gap-10 lg:pb-16">
-          <motion.div {...slam(0.2)} className="lg:col-span-7">
-            <h1 className="text-[clamp(2.25rem,6.5vw,5.75rem)] leading-[0.86]">
-              <BouncyText text="Muhammad" /> <BouncyText text="Ali" />{" "}
-              <BouncyText text="Zahid" className="nb-outline-text" />
-            </h1>
-
-            <p className="bg-ink text-yellow font-display border-ink mt-6 inline-block border-[3px] px-4 py-2.5 text-sm sm:text-base">
+          <motion.div {...slam(0.24)} className="lg:col-span-7">
+            <p className="bg-ink text-yellow font-display border-ink inline-block border-[3px] px-4 py-2.5 text-sm sm:text-base">
               {site.role}
             </p>
 
-            <p className="mt-6 max-w-xl text-base leading-relaxed sm:text-lg">
+            <p className="mt-7 max-w-xl text-base leading-relaxed sm:text-lg">
               {site.tagline}
             </p>
 

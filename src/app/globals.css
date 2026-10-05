@@ -458,29 +458,3 @@
     transform: none;
   }
 }
-
-/* Hero keyboard deck: tipped back like a board on a desk, so the keycaps'
-   travel reads as depth. Flattens on small screens where space is tight. */
-.nb-kb-deck {
-  transform: perspective(1400px) rotateX(16deg);
-  transform-origin: 50% 100%;
-  box-shadow:
-    0 10px 0 0 #2a2a2a,
-    0 10px 0 3px var(--ink);
-}
-
-@media (max-width: 639px) {
-  .nb-kb-deck {
-    transform: perspective(900px) rotateX(8deg);
-  }
-}
-
-.nb-blink {
-  animation: nb-blink 1s steps(1) infinite;
-}
-
-@keyframes nb-blink {
-  50% {
-    opacity: 0;
-  }
-}
