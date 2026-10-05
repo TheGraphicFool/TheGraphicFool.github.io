@@ -210,8 +210,12 @@ export function WorkIndex() {
           animate={{ opacity: previewOn ? 1 : 0, scale: previewOn ? 1 : 0.6 }}
           transition={{ duration: 0.2, ease: [0.22, 1, 0.36, 1] }}
         >
-          <div className="translate-x-6 -translate-y-1/2">
-            <AnimatePresence mode="popLayout" initial={false}>
+          {/* Zero-size anchor at the cursor. Every preview is absolutely
+              positioned on it, so switching rows cross-fades in place
+              instead of stacking the old and new covers in flow (which made
+              the new one jump up once the old one left). */}
+          <div className="relative h-0 w-0">
+            <AnimatePresence initial={false}>
               {hovered && <Preview key={hovered.id} project={hovered} />}
             </AnimatePresence>
           </div>
@@ -230,8 +234,9 @@ function Preview({ project }: { project: Project }) {
       animate={{ opacity: 1, scale: 1, rotate: 0 }}
       exit={{ opacity: 0, scale: 0.92 }}
       transition={{ duration: 0.18 }}
-      className="nb-panel shadow-nb-lg relative overflow-hidden bg-white"
-      style={{ width: PREVIEW_W, height: h }}
+      className="nb-panel shadow-nb-lg absolute overflow-hidden bg-white"
+      // Vertically centred on the cursor, a little to its right.
+      style={{ width: PREVIEW_W, height: h, left: 24, top: -h / 2 }}
     >
       <Image src={coverOf(project).src} alt="" fill sizes={`${PREVIEW_W}px`} className="object-cover" />
       <span
