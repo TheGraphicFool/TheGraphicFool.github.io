@@ -44,10 +44,13 @@
 
   /* Hard shadows as first-class Tailwind utilities so `hover:shadow-nb-lg`
      and friends work without hand-written variant CSS. */
-  --shadow-nb-xs: 3px 3px 0 var(--ink);
-  --shadow-nb: 6px 6px 0 var(--ink);
-  --shadow-nb-lg: 10px 10px 0 var(--ink);
-  --shadow-nb-xl: 16px 16px 0 var(--ink);
+  /* Stacked 1px steps instead of one offset copy: the gap between object and
+     shadow fills in, so panels read as extruded slabs with real side walls
+     rather than a flat card floating over a flat shadow. */
+  --shadow-nb-xs: 1px 1px 0 var(--ink), 2px 2px 0 var(--ink), 3px 3px 0 var(--ink);
+  --shadow-nb: 1px 1px 0 var(--ink), 2px 2px 0 var(--ink), 3px 3px 0 var(--ink), 4px 4px 0 var(--ink), 5px 5px 0 var(--ink), 6px 6px 0 var(--ink);
+  --shadow-nb-lg: 1px 1px 0 var(--ink), 2px 2px 0 var(--ink), 3px 3px 0 var(--ink), 4px 4px 0 var(--ink), 5px 5px 0 var(--ink), 6px 6px 0 var(--ink), 7px 7px 0 var(--ink), 8px 8px 0 var(--ink), 9px 9px 0 var(--ink), 10px 10px 0 var(--ink);
+  --shadow-nb-xl: 1px 1px 0 var(--ink), 2px 2px 0 var(--ink), 3px 3px 0 var(--ink), 4px 4px 0 var(--ink), 5px 5px 0 var(--ink), 6px 6px 0 var(--ink), 7px 7px 0 var(--ink), 8px 8px 0 var(--ink), 9px 9px 0 var(--ink), 10px 10px 0 var(--ink), 11px 11px 0 var(--ink), 12px 12px 0 var(--ink), 13px 13px 0 var(--ink), 14px 14px 0 var(--ink), 15px 15px 0 var(--ink), 16px 16px 0 var(--ink);
   --shadow-nb-none: 0 0 0 var(--ink);
 }
 
@@ -139,27 +142,6 @@
      Interactive — press-into-the-shadow. The object physically moves down-right
      into its own shadow on click, which is the signature NB feedback.
      -------------------------------------------------------------------------- */
-
-  .nb-press {
-    transition:
-      transform 120ms cubic-bezier(0.2, 0, 0, 1),
-      box-shadow 120ms cubic-bezier(0.2, 0, 0, 1),
-      background-color 120ms linear;
-  }
-
-  /* Hover lifts only where hover is real. On touch screens a tap leaves
-     :hover "stuck" on the element until you tap elsewhere. */
-  @media (hover: hover) and (pointer: fine) {
-    .nb-press:hover {
-      transform: translate(-2px, -2px);
-      box-shadow: var(--shadow-nb-lg);
-    }
-  }
-
-  .nb-press:active {
-    transform: translate(var(--nb-offset), var(--nb-offset));
-    box-shadow: 0 0 0 var(--ink);
-  }
 
   /* Cards in the rail lift further and cast a longer shadow. */
   .nb-lift {
@@ -283,7 +265,6 @@
     transform: none !important;
   }
 
-  .nb-press:hover,
   .nb-lift:hover {
     transform: none;
   }
@@ -388,5 +369,118 @@
   }
   .nb-prose hr {
     border-top: var(--nb-border) solid var(--ink);
+  }
+}
+
+/* ==========================================================================
+   KEYCAPS
+   Every pressable button (.nb-press) is a mechanical-keyboard keycap: a face
+   with a lit top edge and a shaded lower lip, sitting on a darker skirt that
+   flares slightly wider than the cap, like a real cap on its switch. Pressing
+   travels the cap down onto the skirt; releasing springs it back with a
+   little overshoot.
+
+   Deliberately unlayered: it has to beat the `shadow-nb*` utilities that the
+   buttons still carry (unlayered CSS outranks every cascade layer).
+   ========================================================================== */
+
+.nb-press {
+  --key-face: var(--white);
+  --key-side: color-mix(in srgb, var(--key-face) 52%, var(--ink));
+  --key-depth: 6px;
+  --key-y: 0px;
+
+  position: relative;
+  border-radius: 10px;
+  transform: translateY(var(--key-y));
+  box-shadow:
+    inset 0 3px 0 rgb(255 255 255 / 0.5),
+    inset 3px 0 0 rgb(255 255 255 / 0.18),
+    inset 0 -4px 0 rgb(0 0 0 / 0.16),
+    0 var(--key-depth) 0 0 var(--key-side),
+    0 var(--key-depth) 0 3px var(--ink);
+  /* Release: springy and slightly overshooting. */
+  transition:
+    transform 260ms cubic-bezier(0.34, 1.8, 0.64, 1),
+    box-shadow 260ms cubic-bezier(0.34, 1.8, 0.64, 1),
+    background-color 120ms linear,
+    color 120ms linear;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .nb-press:hover {
+    --key-y: -2px;
+    --key-depth: 8px;
+  }
+}
+
+/* Down: fast and flat, bottoming out on the switch. */
+.nb-press:active,
+.nb-press[data-down="true"] {
+  --key-y: 5px;
+  --key-depth: 1px;
+  transition-duration: 45ms;
+  transition-timing-function: cubic-bezier(0.2, 0, 0, 1);
+}
+
+/* Toggle keys that are "on" stay latched halfway down. */
+.nb-press[aria-pressed="true"] {
+  --key-y: 4px;
+  --key-depth: 2px;
+}
+
+/* Skirt colour follows the cap colour (a darker shade of it). */
+.nb-press.bg-white { --key-face: var(--white); }
+.nb-press.bg-paper { --key-face: var(--paper); }
+.nb-press.bg-yellow { --key-face: var(--yellow); }
+.nb-press.bg-pink { --key-face: var(--pink); }
+.nb-press.bg-cyan { --key-face: var(--cyan); }
+.nb-press.bg-lime { --key-face: var(--lime); }
+.nb-press.bg-violet { --key-face: var(--violet); }
+.nb-press.bg-orange { --key-face: var(--orange); }
+.nb-press.bg-ink { --key-face: #3a3a3a; }
+.nb-press.bg-\[\#1769ff\] { --key-face: #1769ff; }
+
+@media (hover: hover) and (pointer: fine) {
+  .nb-press.hover\:bg-yellow:hover { --key-face: var(--yellow); }
+  .nb-press.hover\:bg-pink:hover { --key-face: var(--pink); }
+  .nb-press.hover\:bg-cyan:hover { --key-face: var(--cyan); }
+  .nb-press.hover\:bg-lime:hover { --key-face: var(--lime); }
+  .nb-press.hover\:bg-ink:hover { --key-face: #3a3a3a; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .nb-press,
+  .nb-press:hover,
+  .nb-press:active,
+  .nb-press[data-down="true"] {
+    --key-y: 0px;
+    transform: none;
+  }
+}
+
+/* Hero keyboard deck: tipped back like a board on a desk, so the keycaps'
+   travel reads as depth. Flattens on small screens where space is tight. */
+.nb-kb-deck {
+  transform: perspective(1400px) rotateX(16deg);
+  transform-origin: 50% 100%;
+  box-shadow:
+    0 10px 0 0 #2a2a2a,
+    0 10px 0 3px var(--ink);
+}
+
+@media (max-width: 639px) {
+  .nb-kb-deck {
+    transform: perspective(900px) rotateX(8deg);
+  }
+}
+
+.nb-blink {
+  animation: nb-blink 1s steps(1) infinite;
+}
+
+@keyframes nb-blink {
+  50% {
+    opacity: 0;
   }
 }

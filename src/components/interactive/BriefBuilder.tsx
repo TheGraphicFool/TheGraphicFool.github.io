@@ -40,7 +40,7 @@ function ChipGroup<T extends string>({ legend, options, selected, multi, onChang
               }
               className={`nb-panel nb-press font-display px-3.5 py-2 text-sm ${
                 active
-                  ? "bg-ink text-yellow shadow-nb-none translate-x-[3px] translate-y-[3px]"
+                  ? "bg-ink text-yellow"
                   : "bg-white shadow-nb-xs hover:bg-yellow"
               }`}
             >
