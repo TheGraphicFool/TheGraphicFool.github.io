@@ -458,3 +458,45 @@
     transform: none;
   }
 }
+
+/* --------------------------------------------------------------------------
+   The Fool card (hero)
+   -------------------------------------------------------------------------- */
+
+/* Printed-dot texture over the duotone portrait. */
+.nb-halftone {
+  background-image: radial-gradient(rgb(10 10 10 / 0.22) 0.9px, transparent 1.2px);
+  background-size: 5px 5px;
+  mix-blend-mode: multiply;
+}
+
+/* Foil sheen: a bright diagonal band whose position follows the pointer. */
+.nb-foil {
+  background-image: linear-gradient(
+    115deg,
+    transparent 30%,
+    rgb(255 255 255 / 0.55) 44%,
+    rgb(0 224 255 / 0.3) 49%,
+    rgb(255 61 139 / 0.3) 54%,
+    transparent 68%
+  );
+  background-size: 260% 260%;
+  background-position: 50% 50%;
+  mix-blend-mode: soft-light;
+}
+
+/* Touch screens can't steer the sheen, so it sweeps on its own. */
+@media (hover: none), (pointer: coarse) {
+  .nb-foil {
+    animation: nb-foil-sweep 5s ease-in-out infinite alternate;
+  }
+}
+
+@keyframes nb-foil-sweep {
+  from {
+    background-position: 0% 0%;
+  }
+  to {
+    background-position: 100% 100%;
+  }
+}
