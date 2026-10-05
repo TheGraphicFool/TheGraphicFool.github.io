@@ -2,7 +2,7 @@ import { Hero } from "@/components/sections/Hero";
 import { Services } from "@/components/sections/Services";
 import { About } from "@/components/sections/About";
 import { Contact } from "@/components/sections/Contact";
-import { WorkRail } from "@/components/work/WorkRail";
+import { WorkIndex } from "@/components/work/WorkIndex";
 import { Marquee } from "@/components/ui/Marquee";
 import { marqueeItems } from "@/data/site";
 
@@ -11,7 +11,7 @@ export default function Home() {
     <>
       <Hero />
       <Marquee items={marqueeItems} duration={38} />
-      <WorkRail />
+      <WorkIndex />
       <Services />
       <Marquee
         items={["Available Q2 2026", "Say hello", "Briefs welcome", "Let's talk"]}
