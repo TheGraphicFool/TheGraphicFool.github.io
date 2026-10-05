@@ -92,7 +92,9 @@ export function Hero() {
                   animate: { opacity: 1, x: 0 },
                   transition: { duration: 0.6, delay: 0.3, ease: EASE },
                 })}
-            className="relative self-start lg:col-span-5"
+            // On desktop the card is pulled out of the grid and laid over the
+            // top-right of the name, tilted, as if tossed onto the page.
+            className="relative z-20 self-start lg:absolute lg:top-8 lg:right-6 lg:w-[330px] lg:rotate-[5deg] xl:right-14 2xl:right-[15%]"
           >
             {site.available && (
               <div className="absolute -top-5 left-1/2 z-30 sm:left-auto sm:right-6 lg:right-4 xl:right-12">
