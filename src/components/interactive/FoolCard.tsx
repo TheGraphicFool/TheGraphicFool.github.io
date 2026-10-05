@@ -71,7 +71,7 @@ export function FoolCard() {
   const fortune = FORTUNES[(draw - 1 + FORTUNES.length) % FORTUNES.length];
 
   return (
-    <div className="mx-auto w-full max-w-[330px] [perspective:1400px]">
+    <div className="mx-auto w-full [perspective:1400px]">
       {/* Two-colour print: shadows → ink, highlights → yellow. */}
       <svg aria-hidden width="0" height="0" className="absolute">
         <filter id="fool-duotone" colorInterpolationFilters="sRGB">
@@ -122,7 +122,7 @@ export function FoolCard() {
                   alt={`${site.name} as The Fool`}
                   fill
                   priority
-                  sizes="330px"
+                  sizes="400px"
                   className="object-cover object-top [filter:url(#fool-duotone)_contrast(1.1)]"
                 />
                 <div aria-hidden className="nb-halftone pointer-events-none absolute inset-0" />
