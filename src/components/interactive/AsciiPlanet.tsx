@@ -19,9 +19,13 @@ const RAMP =
 const RING_RAMP = " .,:;-=+*#";
 const STAR_GLYPHS = [".", "'", "+", "*", "+"];
 
-const CELL_W = 7; // px per column at 1x — character size stays fixed
-const CELL_H = 12; // px per row at 1x
+// Small cells = more characters across the planet = finer detail. At 4×7px a
+// desktop canvas is ~230×130 characters (~30k cells), so the frame rate
+// adapts below if a slower machine can't keep up.
+const CELL_W = 4; // px per column at 1x
+const CELL_H = 7; // px per row at 1x
 const FPS = 30;
+const MIN_FPS = 15;
 
 const PLANET_R = 0.72;
 const RING_IN = 0.86;
@@ -61,7 +65,12 @@ function noise(x: number, y: number) {
 }
 /** Three octaves of noise — enough turbulence for cloud bands. */
 function fbm(x: number, y: number) {
-  return noise(x, y) * 0.55 + noise(x * 2.1, y * 2.1) * 0.3 + noise(x * 4.3, y * 4.3) * 0.15;
+  return (
+    noise(x, y) * 0.5 +
+    noise(x * 2.1, y * 2.1) * 0.25 +
+    noise(x * 4.3, y * 4.3) * 0.15 +
+    noise(x * 8.7, y * 8.7) * 0.1
+  );
 }
 
 function charFor(ramp: string, value: number) {
@@ -183,7 +192,12 @@ export function AsciiPlanet({ className = "" }: { className?: string }) {
             const turb = fbm(lon * 1.6, lat * 4.5);
             const bands = 0.5 + 0.5 * Math.sin(lat * 11 + turb * 3.2);
             const fine = 0.5 + 0.5 * Math.sin(lat * 38 + turb * 6);
-            let albedo = 0.45 + 0.3 * bands + 0.12 * fine;
+            // Hairline streaks inside each band, only resolvable at small cells.
+            const wisps = 0.5 + 0.5 * Math.sin(lat * 96 + turb * 14 + Math.sin(lon * 3) * 2);
+            let albedo = 0.42 + 0.28 * bands + 0.12 * fine + 0.08 * wisps;
+            // Scattered bright cloud puffs drifting with the rotation.
+            const puffs = noise(lon * 7 + 40, lat * 14);
+            if (puffs > 0.74) albedo = Math.min(1, albedo + (puffs - 0.74) * 1.6);
 
             // A great storm: an oval vortex riding one band.
             const sLon = Math.atan2(Math.sin(lon - 1.2), Math.cos(lon - 1.2));
@@ -223,7 +237,8 @@ export function AsciiPlanet({ className = "" }: { className?: string }) {
             if (dist > RING_IN && dist < RING_OUT) {
               const t = (dist - RING_IN) / (RING_OUT - RING_IN);
               // Ringlets of different density, plus a dark division.
-              const ringlets = 0.55 + 0.45 * Math.sin(t * 52) * Math.sin(t * 13 + 1);
+              const ringlets =
+                0.5 + 0.3 * Math.sin(t * 52) * Math.sin(t * 13 + 1) + 0.2 * Math.sin(t * 140);
               const bandDensity = t < 0.18 ? 0.45 : t < 0.46 ? 1 : t < 0.55 ? 0.05 : t < 0.85 ? 0.8 : 0.35;
               const angle = Math.atan2(rz, px);
               const dust = 0.75 + 0.25 * hash(Math.floor(angle * 40 + ringDrift * 40), Math.floor(t * 30));
@@ -250,7 +265,9 @@ export function AsciiPlanet({ className = "" }: { className?: string }) {
               const ny = mdy / MOON_R;
               const nz = Math.sqrt(Math.max(0, 1 - nx * nx - ny * ny));
               const diffuse = Math.max(0, nx * LIGHT[0] + ny * LIGHT[1] + nz * LIGHT[2]);
-              const craters = noise(nx * 5 + 3, ny * 5 + 7) > 0.68 ? 0.55 : 1;
+              const craterNoise = noise(nx * 7 + 3, ny * 7 + 7);
+              // Dark crater floors with a bright rim on their edge.
+              const craters = craterNoise > 0.7 ? 0.5 : craterNoise > 0.64 ? 1.15 : 1;
               let shade = (0.08 + diffuse * 0.92) * (0.6 + 0.4 * noise(nx * 9, ny * 9)) * craters;
               if (planetBlocksLight(moon[0] + mdx, moon[1] + mdy, mz)) shade *= 0.2; // eclipse
               ch = charFor(RAMP, clamp01(shade));
@@ -261,9 +278,9 @@ export function AsciiPlanet({ className = "" }: { className?: string }) {
           // --- Stars: sparse, twinkling, only in empty sky -----------------
           if (ch === " ") {
             const s = hash(c * 1.37, r * 2.11);
-            if (s > 0.99) {
+            if (s > 0.995) {
               const phase = hash(c + twinkle * 0.13, r);
-              const g = phase > 0.8 ? STAR_GLYPHS[2 + Math.floor((s - 0.99) * 300) % 3] : STAR_GLYPHS[phase > 0.35 ? 1 : 0];
+              const g = phase > 0.8 ? STAR_GLYPHS[2 + Math.floor((s - 0.995) * 600) % 3] : STAR_GLYPHS[phase > 0.35 ? 1 : 0];
               ch = g;
             }
           }
@@ -275,16 +292,25 @@ export function AsciiPlanet({ className = "" }: { className?: string }) {
       }
     }
 
+    // Adaptive frame rate: if drawing a frame costs too much (slow phone,
+    // huge canvas), render less often rather than janking the page.
+    let targetFps = FPS;
+    let avgCost = 0;
+
     function frame(now: number) {
       raf = requestAnimationFrame(frame);
       if (!visible) return;
-      if (now - last < 1000 / FPS) return;
+      if (now - last < 1000 / targetFps) return;
       const dt = last ? Math.min(0.1, (now - last) / 1000) : 0;
       last = now;
       if (!dragging) velocity += (0.3 - velocity) * Math.min(1, dt * 1.5); // ease back to cruise
       spin += velocity * dt;
       clock += dt;
+      const t0 = performance.now();
       draw();
+      avgCost = avgCost * 0.9 + (performance.now() - t0) * 0.1;
+      // Keep drawing under ~40% of each frame's budget.
+      targetFps = Math.max(MIN_FPS, Math.min(FPS, 400 / Math.max(avgCost, 1)));
     }
 
     const resizeObserver = new ResizeObserver(resize);
