@@ -35,7 +35,7 @@ export function CategoryFilter<T extends string>({
             onClick={() => onChange(category)}
             className={`nb-panel nb-press font-display flex shrink-0 items-center gap-2 px-4 py-2.5 text-sm ${
               isActive
-                ? "bg-ink text-yellow shadow-nb-none translate-x-[3px] translate-y-[3px]"
+                ? "bg-ink text-yellow"
                 : "bg-white shadow-nb-xs hover:bg-yellow"
             }`}
           >
