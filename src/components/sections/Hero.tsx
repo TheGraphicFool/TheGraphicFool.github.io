@@ -5,9 +5,8 @@ import { motion, useReducedMotion } from "framer-motion";
 import { site } from "@/data/site";
 import { useRef } from "react";
 import { BouncyText } from "@/components/interactive/BouncyText";
-import { ColorBlock } from "@/components/interactive/ColorBlock";
 import { DragSticker } from "@/components/interactive/DragSticker";
-import { Tilt } from "@/components/interactive/Tilt";
+import { FoolCard } from "@/components/interactive/FoolCard";
 
 const EASE = [0.16, 1, 0.3, 1] as const;
 
@@ -96,7 +95,7 @@ export function Hero() {
             className="relative self-start lg:col-span-5"
           >
             {site.available && (
-              <div className="absolute -top-5 right-2 z-10 sm:right-6 lg:right-0">
+              <div className="absolute -top-5 left-1/2 z-30 sm:left-auto sm:right-6 lg:right-4 xl:right-12">
                 <motion.div
                   initial={reduceMotion ? false : { opacity: 0, scale: 0.4, rotate: 14 }}
                   animate={{ opacity: 1, scale: 1, rotate: -7 }}
@@ -117,24 +116,8 @@ export function Hero() {
               </div>
             )}
 
-            <Tilt className="nb-panel shadow-nb-lg overflow-hidden bg-white">
-              <ColorBlock label={site.initials} />
-              <dl>
-                {site.facts.map((fact, i) => (
-                  <div
-                    key={fact.label}
-                    className={`flex items-center justify-between gap-4 px-4 py-3.5 ${
-                      i > 0 ? "border-ink border-t-[3px]" : ""
-                    }`}
-                  >
-                    <dt className="nb-label opacity-55">{fact.label}</dt>
-                    <dd className="font-display text-right text-sm">
-                      {fact.value}
-                    </dd>
-                  </div>
-                ))}
-              </dl>
-            </Tilt>
+            {/* 0 — THE FOOL: the studio name as a tarot card. Flips for a reading. */}
+            <FoolCard />
           </motion.div>
         </div>
       </div>
